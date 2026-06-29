@@ -5,10 +5,17 @@ from bs4 import BeautifulSoup
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import streamlit as st
 
 # --- CONFIGURAÇÃO EXCLUSIVA PARA ALERTA DE ERROS ---
-EMAIL_SUPORTE = "automacao.teste.2026@outlook.com"
-SENHA_SUPORTE = "@Daniel2022" 
+# Correção: Envolvido em try/except para evitar o erro StreamlitSecretNotFoundError localmente
+try:
+    EMAIL_SUPORTE = st.secrets.get("EMAIL_SUPORTE", "automacao.teste.2026@outlook.com")
+    SENHA_SUPORTE = st.secrets.get("SENHA_SUPORTE", "@Daniel2022") 
+except Exception:
+    # Caso execute localmente fora do ambiente Streamlit Cloud, assume os valores padrão
+    EMAIL_SUPORTE = "automacao.teste.2026@outlook.com"
+    SENHA_SUPORTE = "@Daniel2022"
 
 def notificar_problema_sistema(detalhes_erro):
     smtp_server = "smtp.office365.com"
@@ -19,8 +26,9 @@ def notificar_problema_sistema(detalhes_erro):
     msg['Subject'] = "🚨 ALERTA: Erro Crítico na Inicialização de Dados de Viagem"
     corpo = f"Falha reportada na geração de relatórios:\n\n{detalhes_erro}"
     msg.attach(MIMEText(corpo, 'plain'))
+    
     try:
-        servidor = smtplib.SMTP(smtp_server, porto_smtp, timeout=10)
+        servidor = smtplib.SMTP(smtp_server, porto_smtp, timeout=5)
         servidor.ehlo()
         servidor.starttls()
         servidor.ehlo()
@@ -28,7 +36,7 @@ def notificar_problema_sistema(detalhes_erro):
         servidor.sendmail(EMAIL_SUPORTE, EMAIL_SUPORTE, msg.as_string())
         servidor.quit()
     except Exception as e:
-        print(f"Não foi possível notificar o suporte via SMTP: {e}")
+        print(f"Não foi possível notificar o suporte via SMTP (Bloqueio de nuvem ou credenciais): {e}")
 
 def buscar_imagem_postal_exata(destino):
     destino_busca = destino.strip().lower()
@@ -139,7 +147,7 @@ def rodar_busca_geral(destino, mes):
             "fuso_horario": fuso_local,
             "valor_moeda_compra": valor_cambio,
             "tabela_valores": cronograma_clima,
-            "hoteis": ["Rede hoteleira centralizada por estado", "Estadias Executivas Locais"],
+            "hoteis": ["Rede hoteleira centralizada por state", "Estadias Executivas Locais"],
             "restaurantes": ["Gastronomia Tradicional Regional", "Centros Gastronômicos Urbanos"]
         }
     except Exception as erro:

@@ -28,7 +28,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 with st.sidebar:
-    st.image("https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=300&q=80", use_container_width=True)
+    st.image("https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=300&q=80", use_column_width=True)
     st.markdown("### 🔍 Configuração do Planejamento")
     
     destino_usuario = st.text_input("📍 Digite o destino (Cidade/Estado/País):", value="Canadá")
@@ -43,7 +43,7 @@ with st.sidebar:
 st.title("✈️ Portal de Inteligência Turística Local")
 st.write("Consolide relatórios geográficos, cenários visuais exclusivos, fuso horário e tabelas climatológicas.")
 
-# NOVO: Força o carregamento automático dos dados na inicialização do site
+# Força o carregamento automático dos dados na inicialização do site
 if 'dados_site' not in st.session_state:
     st.session_state['last_dest'] = destino_usuario
     st.session_state['last_month'] = mes_usuario
