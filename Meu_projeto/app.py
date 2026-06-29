@@ -14,15 +14,21 @@ st.markdown("""
         margin-bottom: 20px;
         box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.05);
     }
-    .titulo-cartao { color: #007AFF; font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+    .titulo-cartao { color: #007AFF; font-weight: bold; font-size: 18px; margin-bottom: 12px; }
     .header-resultado { font-size: 28px; font-weight: bold; color: #1C1C1E; }
-    .caixa-abnt {
+    .caixa-turismo {
         background-color: #f8f9fa !important;
-        border: 1px solid #ced4da !important;
-        padding: 40px !important;
-        font-family: 'Times New Roman', Times, serif !important;
-        color: #000000 !important;
+        border-left: 5px solid #28a745 !important;
+        padding: 25px !important;
+        border-radius: 8px;
+        color: #333333 !important;
+        font-family: Arial, sans-serif !important;
         line-height: 1.6 !important;
+        margin-top: 15px;
+    }
+    .ponto-destaque {
+        font-weight: bold;
+        color: #28a745;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -43,7 +49,6 @@ with st.sidebar:
 st.title("✈️ Portal de Inteligência Turística Local")
 st.write("Consolide relatórios geográficos, cenários visuais exclusivos, fuso horário e tabelas climatológicas.")
 
-# Força o carregamento automático dos dados na inicialização do site
 if 'dados_site' not in st.session_state:
     st.session_state['last_dest'] = destino_usuario
     st.session_state['last_month'] = mes_usuario
@@ -52,7 +57,6 @@ if 'dados_site' not in st.session_state:
         if retorno_inicial:
             st.session_state['dados_site'] = retorno_inicial
 
-# Monitoramento de novas interações via clique de botão ou alteração de inputs
 if botao_pesquisar or (destino_usuario and st.session_state.get('last_dest') != destino_usuario) or (mes_usuario and st.session_state.get('last_month') != mes_usuario):
     st.session_state['last_dest'] = destino_usuario
     st.session_state['last_month'] = mes_usuario
@@ -62,7 +66,6 @@ if botao_pesquisar or (destino_usuario and st.session_state.get('last_dest') != 
         if retorno_api:
             st.session_state['dados_site'] = retorno_api
 
-# Exibição constante dos resultados carregados
 if 'dados_site' in st.session_state:
     dados = st.session_state['dados_site']
     
@@ -76,11 +79,11 @@ if 'dados_site' in st.session_state:
         st.image(dados['imagem_capa'], caption=f"Região de Destaque Turístico em {dados['destino']}", use_container_width=True)
         
     with col_direita:
+        st.markdown(f"<div class='cartao-info'><div class='titulo-cartao'>🗺️ Sugestão de Roteiro Prático</div></div>", unsafe_allow_html=True)
+        st.write(dados['roteiro'])
+        
         st.markdown(f"""
-        <div class='cartao-info'>
-            <div class='titulo-cartao'>🏛️ Localização Geográfica e Pontos Turísticos Principais</div>
-            <p><b>Estados, Cidades e Atrações Mapeadas:</b><br>{dados['resumo']}</p>
-            <hr>
+        <div class='cartao-info' style='margin-top: -15px;'>
             <p><b>🕐 Sistema de Fusos Horários (Ref. Horário de Brasília):</b><br>{dados['fuso_horario']}</p>
             <hr>
             <p><b>💱 Cotação da Moeda Local (Compra):</b><br>{dados['valor_moeda_compra']}</p>
@@ -88,56 +91,38 @@ if 'dados_site' in st.session_state:
         """, unsafe_allow_html=True)
 
     st.markdown("### 📊 Indicadores Meteorológicos Médios e Sazonalidade (Mês a Mês)")
-    st.write("Abaixo está a listagem anual contendo as flutuações das médias de temperatura para o planejamento de desembarque:")
     st.table(dados['tabela_valores'])
 
     st.markdown("---")
-    st.markdown("### 📄 Arquivo de Documentação Técnica Gerado")
+    st.markdown("### 📍 Resumo dos Pontos Turísticos e Lugares para Conhecer")
     
-    linhas_tabela_html = ""
-    for item in dados['tabela_valores']:
-        linhas_tabela_html += f"""
-        <tr>
-            <td style='border: 1px solid #ddd; padding: 6px;'>{item['Mês']}</td>
-            <td style='border: 1px solid #ddd; padding: 6px; text-align: center;'>{item['Temperatura Média']}</td>
-            <td style='border: 1px solid #ddd; padding: 6px;'>{item['Sazonalidade']}</td>
-            <td style='border: 1px solid #ddd; padding: 6px;'>{item['Condição Operacional']}</td>
-        </tr>
-        """
+    # As strings HTML abaixo foram "coladas" na parede esquerda (sem espaços no começo) para o Streamlit não criar caixas pretas
+    if "canadá" in dados['destino'].lower() or "canada" in dados['destino'].lower():
+        info_local = """<ul>
+<li><span class='ponto-destaque'>Parque Nacional de Banff (Alberta):</span> Famoso pelas suas impressionantes montanhas rochosas, florestas densas e os icônicos lagos de água azul-turquesa alimentados por geleiras, como o Lake Louise e o Moraine Lake.</li>
+<li><span class='ponto-destaque'>Torre CN (Toronto):</span> Uma das estruturas mais altas do mundo, definindo a linha de horizonte de Toronto com mirantes panorâmicos incríveis e o famoso piso de vidro.</li>
+<li><span class='ponto-destaque'>Cataratas do Niágara (Ontário):</span> Três imensas quedas d'água localizadas na fronteira com os EUA, atraindo milhões de visitantes anualmente para passeios de barco bem próximos à névoa.</li>
+<li><span class='ponto-destaque'>Vancouver e Stanley Park (Colúmbia Britânica):</span> Uma metrópole urbana perfeitamente integrada à natureza costeira, ostentando um parque urbano gigante com florestas temperadas e vista para o oceano Pacifico.</li>
+</ul>"""
+    elif "frança" in dados['destino'].lower() or "franca" in dados['destino'].lower():
+        info_local = """<ul>
+<li><span class='ponto-destaque'>Torre Eiffel e Rio Sena (Paris):</span> O monumento pago mais visitado do mundo, cercado por jardins e passeios de barco românticos que cruzam os principais pontos históricos da capital.</li>
+<li><span class='ponto-destaque'>Museu do Louvre (Paris):</span> O maior museum de arte do planeta, lar da icônica Mona Lisa e de uma imensa coleção de antiguidades reais e esculturas clássicas.</li>
+<li><span class='ponto-destaque'>Palácio de Versalhes:</span> Símbolo histórico da monarquia absoluta francesa com seus imponentes salões espelhados e labirintos verdes milimetricamente desenhados.</li>
+</ul>"""
+    else:
+        info_local = f"""<ul>
+<li><span class='ponto-destaque'>Centro Histórico e Monumentos Locais:</span> Espaços ideais para explorar a herança cultural, arquiteturas típicas e mercados tradicionais da região de {dados['destino']}.</li>
+<li><span class='ponto-destaque'>Parques e Mirantes Naturais:</span> Áreas de preservação ecológica ou pontos elevados perfeitos para fotografias panorâmicas e atividades ao ar livre.</li>
+<li><span class='ponto-destaque'>Rotas Gastronômicas Nacionais:</span> Restaurantes e distritos culinários focados na experimentação dos pratos mais emblemáticos da cultura local.</li>
+</ul>"""
 
-    texto_abnt = f"""
-    <div class='caixa-abnt'>
-        <p style='text-align: center; font-weight: bold; text-transform: uppercase;'>UNIVERSIDADE GLOBAL DE TECNOLOGIA E TURISMO<br>SISTEMA DE MONITORAMENTO DE MERCADO E DIRETRIZES DE VIAGEM</p>
-        <br>
-        <p style='text-align: center; font-weight: bold; font-size: 18px; text-transform: uppercase;'>RELATÓRIO TÉCNICO DE VIAGEM E MAPEAMENTO CLIMÁTICO: {dados['destino'].upper()}</p>
-        <br>
-        <p style='text-align: justify;'><b>1. CONFIGURAÇÃO GEOGRÁFICA, ESTADOS E PONTOS TURÍSTICOS</b><br>
-        Este documento consolida o mapeamento macrogeográfico realizado para o destino {dados['destino']}. O levantamento de dados identificou os eixos estaduais e municipais de maior fluxo turístico, registrando a seguinte consolidação estrutural das atrações mais visitadas da região: {dados['resumo']}.</p>
-        
-        <p style='text-align: justify;'><b>2. SINCROLOGIA INTERNACIONAL E MARCADORES DE FUSO HORÁRIO</b><br>
-        Para fins de alinhamento de infraestrutura de transporte e comunicações corporativas, determinou-se que o fuso horário oficial associado ao destino apresenta-se configurado como: <u>{dados['fuso_horario']}</u>, tendo como vetor referencial a hora oficial de Brasília (GMT-3).</p>
-        
-        <p style='text-align: justify;'><b>3. COMPORTAMENTO METEOROLÓGICO ANUAL E TEMPERATURAS MÉDIAS</b><br>
-        Abaixo apresenta-se a distribuição sistemática dos doze meses cronológicos do ano, discriminando as médias térmicas estimadas e as respectivas janelas de sazonalidade comercial do mercado de turismo:</p>
-        
-        <table style='width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px; margin: 15px 0;'>
-            <thead>
-                <tr style='background-color: #f2f2f2; font-weight: bold;'>
-                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Mês Cronológico</th>
-                    <th style='border: 1px solid #ddd; padding: 8px; text-align: center;'>Temperatura Média</th>
-                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Sazonalidade Comercial</th>
-                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Condição Climática Observada</th>
-                </tr>
-            </thead>
-            <tbody>
-                {linhas_tabela_html}
-            </tbody>
-        </table>
-        
-        <p style='text-align: justify;'><b>4. DIRETRIZES LOGÍSTICAS E DIRECIONAMENTO ALFANDEGÁRIO</b><br>
-        Com base nos indexadores financeiros oficiais e na coleta mercantil de câmbio, estipulou-se o valor de compra em tempo real de <b>{dados['valor_moeda_compra']}</b> por unidade de moeda nacional, balizando os limites de declaração de fundos exigidos pelos órgãos competentes.</p>
-        <br><br>
-        <p style='text-align: center;'>Mapeamento Governamental e Comercial de Dados — Ano 2026</p>
-    </div>
-    """
-    st.markdown(texto_abnt, unsafe_allow_html=True)
+    # Montando o HTML final totalmente encostado à esquerda para evitar a interpretação de código do Markdown
+    html_final = f"""<div class='caixa-turismo'>
+<h4 style='margin-top: 0; color: #28a745;'>🗺️ Informações Relevantes sobre {dados['destino']}</h4>
+<p>O destino selecionado oferece uma rica gama de atrações que mesclam modernidade, traços culturais marcantes e paisagens naturais preservadas. Abaixo estão os locais mais recomendados e de maior prestígio para inclusão imediata em seu roteiro de viagem:</p>
+{info_local}
+<p style='font-size: 13px; color: #666; margin-bottom: 0; margin-top: 15px;'><i>Mapeamento de Pontos de Interesse Turístico Comercial — Atualizado 2026</i></p>
+</div>"""
+
+    st.markdown(html_final, unsafe_allow_html=True)
