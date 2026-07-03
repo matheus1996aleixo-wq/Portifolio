@@ -6,7 +6,7 @@ import glob
 
 # 1. Configurações de Layout da Página
 st.set_page_config(
-    page_title="Matheus Aleixo | matheusaleixo",
+    page_title="Matheus Aleixo | Matheus Aleixo",
     page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
