@@ -6,7 +6,7 @@ import glob
 
 # 1. Configurações de Layout da Página
 st.set_page_config(
-    page_title="Matheus Aleixo | Portfólio de TI & Dados",
+    page_title="Matheus Aleixo | matheusaleixo",
     page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -269,7 +269,7 @@ with st.sidebar:
                 st.rerun()
 
 # --- 5. CABEÇALHO DO SITE ---
-st.title("💻 Portfólio Profissional de TI & Inteligência de Dados")
+st.title("💻 matheusaleixo")
 st.markdown("<p style='font-size: 1.2rem; color: #94A3B8; max-width: 900px;'>Especialista no desenvolvimento de automações (RPA), engenharia de pipelines de dados ETL, análises corporativas em Power BI e suporte técnico/funcional a ecossistemas ERP SAP (ECC e S/4HANA).</p>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
