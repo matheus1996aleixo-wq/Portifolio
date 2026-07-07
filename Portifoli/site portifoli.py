@@ -91,7 +91,7 @@ COMPETÊNCIAS TÉCNICAS:
 - BI & Dados: Power BI Avançado (Dashboards Gerenciais e Modelagem DAX), Bancos de Dados Relacionais (PostgreSQL), Pipelines ETL & Manipulação de Dados (JSON, XML, HTML).
 - Automação (RPA): Python Avançado (Scrapy, Playwright, BeautifulSoup), Plataforma de Robótica UiPath.
 - ERP Integrado: Suporte Funcional SAP (ECC e S/4HANA), Módulos FI, CO, SD, MM, Basis, ABAP debug e Solução Fiscal Guepardo.
-- Práticas de Nuvem: Controle de versão distribuído via Git/GitHub, noções de escalabilidade serverless em nuvem (AWS Lambda / EventBridge) e orquestradores de fluxo (Apache Airflow)."""
+- Práticas de Nuvem: Controle de versão distribuído via Git/GitHub, noções de escalabilidade serverless in nuvem (AWS Lambda / EventBridge) e orquestradores de fluxo (Apache Airflow)."""
 
 # --- INJEÇÃO DE ESTILOS CSS PREMIUM ---
 st.markdown("""
@@ -248,7 +248,7 @@ with st.sidebar:
     st.markdown("**💼 Disponibilidade:** Remoto / Híbrido / Presencial")
     st.markdown("**🌐 Idiomas:** Inglês (Básico)")
     st.markdown("**✉️ E-mail:** [matheus.aleixo2020@gmail.com](mailto:matheus.aleixo2020@gmail.com)")
-    st.markdown("**🔗 LinkedIn:** [Acessar Perfil](www.linkedin.com/in/matheus-aleixo-299a05247)")
+    st.markdown("**🔗 LinkedIn:** [Acessar Perfil](https://www.linkedin.com/in/matheus-aleixo-299a05247)")
     
     # --- EASTER EGG: BOTÃO SECRETO DE SISTEMA ADMINISTRATIVO ---
     st.markdown("<br><br><br><br>", unsafe_allow_html=True)
@@ -524,7 +524,7 @@ if st.session_state["autenticado"]:
                     with open(nome_padrao_foto, "wb") as f:
                         f.write(foto_carregada.getbuffer())
                         
-                    st.success("✨ Imagem atualizada com sucesso! Recarregando a interface...")
+                    st.success("✨ Imagem updated com sucesso! Recarregando a interface...")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar arquivo: {e}")
