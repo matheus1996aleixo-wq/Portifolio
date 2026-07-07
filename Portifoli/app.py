@@ -65,7 +65,7 @@ foto_base64 = obter_imagem_base64_flexivel()
 # --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ANEXADO ---
 TEXTO_CURRICULO = """MATHEUS ALEIXO
 Várzea Paulista/SP | matheus.aleixo2020@gmail.com | (11) 97478-0590
-LinkedIn: https://www.linkedin.com/in/mathcus-aleixo-299a05247/
+LinkedIn: www.linkedin.com/in/matheus-aleixo-299a05247
 
 OBJETIVO ESTRATÉGICO:
 Atuar de forma analítica e consultiva na área de Tecnologia da Informação como Analista de Sistemas, Desenvolvedor ou Analista de Dados / Power BI. Foco em aplicar competências analíticas refinadas e estratégias tecnológicas modernas para estruturar dados, desenhar dashboards inteligentes e garantir a governança corporativa de ponta a ponta.
