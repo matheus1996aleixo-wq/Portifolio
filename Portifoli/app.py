@@ -65,7 +65,7 @@ foto_base64 = obter_imagem_base64_flexivel()
 # --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ANEXADO ---
 TEXTO_CURRICULO = """MATHEUS ALEIXO
 Várzea Paulista/SP | matheus.aleixo2020@gmail.com | (11) 97478-0590
-LinkedIn: www.linkedin.com/in/matheus-aleixo-299a05247
+LinkedIn: https://www.linkedin.com/in/matheus-aleixo-299a05247
 
 OBJETIVO ESTRATÉGICO:
 Atuar de forma analítica e consultiva na área de Tecnologia da Informação como Analista de Sistemas, Desenvolvedor ou Analista de Dados / Power BI. Foco em aplicar competências analíticas refinadas e estratégias tecnológicas modernas para estruturar dados, desenhar dashboards inteligentes e garantir a governança corporativa de ponta a ponta.
@@ -84,7 +84,7 @@ HISTÓRICO PROFISSIONAL:
 
 3. Estagiário de Tecnologia da Informação - Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)
    • Atuação direta em suporte funcional SAP ECC nos módulos Basis, MM, FI, CO e SD, atendendo fluxos de Procure-to-Pay (P2P).
-   • Projeto SPIRIT: Participação ativa na iniciativa global da Continental de harmonização dos ambientes e consolidação de servidores SAP do grupo.
+   • Projeto SPIRIT: Participação activa na iniciativa global da Continental de harmonização dos ambientes e consolidação de servidores SAP do grupo.
    • Atuação analítica com a solução fiscal Guepardo (extração de relatórios, análises em debug do sistema e transporte de requests).
 
 COMPETÊNCIAS TÉCNICAS:
@@ -248,7 +248,7 @@ with st.sidebar:
     st.markdown("**💼 Disponibilidade:** Remoto / Híbrido / Presencial")
     st.markdown("**🌐 Idiomas:** Inglês (Básico)")
     st.markdown("**✉️ E-mail:** [matheus.aleixo2020@gmail.com](mailto:matheus.aleixo2020@gmail.com)")
-    st.markdown("**🔗 LinkedIn:** [Acessar Perfil](www.linkedin.com/in/matheus-aleixo-299a05247)")
+    st.markdown("**🔗 LinkedIn:** [Acessar Perfil](https://www.linkedin.com/in/matheus-aleixo-299a05247)")
     
     # --- EASTER EGG: BOTÃO SECRETO DE SISTEMA ADMINISTRATIVO ---
     st.markdown("<br><br><br><br>", unsafe_allow_html=True)
@@ -507,7 +507,7 @@ if st.session_state["autenticado"]:
         foto_carregada = st.file_uploader("Escolha um arquivo de imagem", type=["jpg", "jpeg", "png"])
         
         if foto_carregada is not None:
-            # Mostra um preview temporário para conferência
+            # Mostra um preview temporário para referência
             st.image(foto_carregada, width=200, caption="Pré-visualização do arquivo selecionado")
             
             if st.button("💾 Aplicar Nova Imagem ao Perfil", type="primary"):
