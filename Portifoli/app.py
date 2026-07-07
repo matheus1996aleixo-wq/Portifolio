@@ -248,7 +248,7 @@ with st.sidebar:
     st.markdown("**💼 Disponibilidade:** Remoto / Híbrido / Presencial")
     st.markdown("**🌐 Idiomas:** Inglês (Básico)")
     st.markdown("**✉️ E-mail:** [matheus.aleixo2020@gmail.com](mailto:matheus.aleixo2020@gmail.com)")
-    st.markdown("**🔗 LinkedIn:** [Acessar Perfil](https://www.linkedin.com/in/mathcus-aleixo-299a05247/)")
+    st.markdown("**🔗 LinkedIn:** [Acessar Perfil](www.linkedin.com/in/matheus-aleixo-299a05247)")
     
     # --- EASTER EGG: BOTÃO SECRETO DE SISTEMA ADMINISTRATIVO ---
     st.markdown("<br><br><br><br>", unsafe_allow_html=True)
