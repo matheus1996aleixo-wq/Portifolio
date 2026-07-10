@@ -173,7 +173,7 @@ if st.session_state["autenticado"]:
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
         if foto_carregada is not None:
             st.image(foto_carregada, width=200)
-                  if st.button("💾 Aplicar Nova Imagem", type="primary"):
+                          if st.button("💾 Aplicar Nova Imagem", type="primary"):
              try:
                  if os.path.exists(NOME_FOTO):
                      os.remove(NOME_FOTO)
