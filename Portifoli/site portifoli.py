@@ -173,6 +173,27 @@ with st.sidebar:
             if st.button("🔒 Efetuar Logoff / Sair", type="primary"):
                 st.session_state["autenticado"] = False
                 st.rerun()
+            
+            # ATUALIZAÇÃO DE FOTO MOVIDA PARA A SIDEBAR (SÓ APARECE SE LOGADO)
+            st.markdown("---")
+            st.markdown("### 🖼️ Foto de Perfil")
+            foto_carregada = st.file_uploader("Substituir imagem", type=["jpg", "jpeg", "png"], key="side_upload_foto")
+            if foto_carregada is not None:
+                st.image(foto_carregada, width=100)
+                if st.button("💾 Aplicar Foto", type="primary", key="btn_save_photo"):
+                    try:
+                        for ext in ["*.jpg", "*.jpeg", "*.png"]:
+                            for arq_antigo in glob.glob(ext):
+                                if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
+                                    os.remove(arq_antigo)
+                        nome_padrao_foto = "Foto perfil Matheus.jpg"
+                        with open(nome_padrao_foto, "wb") as f:
+                            f.write(foto_carregada.getbuffer())
+                        sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
+                        st.success("Imagem atualizada!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro: {e}")
 
 # --- 5. CABEÇALHO DO SITE ---
 st.title("💻 M. Aleixo TI")
@@ -183,172 +204,235 @@ aba_sobre, aba_experiencias, aba_conhecimentos, aba_projetos, aba_formacao = st.
     "👤 Objetivo & Foco", "💼 Trajetória Profissional", "🧠 Conhecimentos Técnicos", "🚀 Meus Projetos", "📚 Cursos e Formação"
 ])
 
-# (Rederizações das abas normais omitidas aqui para manter o foco no painel, continuam iguais no seu sistema)
+# ==========================================
+# --- ABA 1: OBJETIVO & FOCO ---
+# ==========================================
+with aba_sobre:
+    st.markdown("## Perfil e Objetivo Estratégico")
+    if not df_vagas.empty:
+        colunas_vagas = st.columns(len(df_vagas))
+        for idx, row in df_vagas.iterrows():
+            with colunas_vagas[idx % len(df_vagas)]:
+                st.markdown(f"""
+                <div class="focus-card">
+                    <h3 style="margin-top:0;">{row['Título']}</h3>
+                    <p style="font-size:0.95rem; color:#94A3B8; line-height:1.5;">{row['Descrição']}</p>
+                </div>
+                """, unsafe_allow_html=True)
 
-# --- PAINEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO ---
-if st.session_state["autenticado"]:
-    st.markdown("---")
-    st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
+    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
+    if st.session_state["autenticado"]:
+        st.markdown("<br><hr><h2>🔒 Gerenciar Focos de Vagas (Objetivo)</h2>", unsafe_allow_html=True)
+        col_v1, col_v2 = st.columns([1, 2])
+        with col_v1:
+            st.subheader("📝 Inserir Novo Foco")
+            v_tit = st.text_input("Área/Vaga", key="aba_vaga_tit")
+            v_des = st.text_area("Descrição Estratégica", key="aba_vaga_des")
+            if st.button("🚀 Gravar Novo Foco", key="aba_vaga_save"):
+                if v_tit and v_des:
+                    nl = pd.DataFrame([{"Título": v_tit, "Descrição": v_des}])
+                    pd.concat([df_vagas, nl], ignore_index=True).to_csv(ARQUIVO_VAGAS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Adicionado foco de vaga '{v_tit}'")
+                    st.success("Foco Adicionado!")
+                    st.rerun()
+        with col_v2:
+            st.subheader("🗑️ Remover Focos Existentes")
+            if not df_vagas.empty:
+                item_vaga_sel = None
+                for idx, row in df_vagas.iterrows():
+                    if st.checkbox(f"Apagar Foco: **{row['Título']}**", key=f"aba_del_vaga_{idx}"):
+                        item_vaga_sel = idx
+                if item_vaga_sel is not None:
+                    if st.button("❌ Confirmar Exclusão de Foco", type="primary", key="aba_vaga_del_btn"):
+                        foco_removido = df_vagas.loc[item_vaga_sel, 'Título']
+                        df_vagas.drop(item_vaga_sel).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
+                        sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
+                        st.success("Foco excluído!")
+                        st.rerun()
+
+# ==========================================
+# --- ABA 2: TRAJETÓRIA PROFISSIONAL ---
+# ==========================================
+with aba_experiencias:
+    st.markdown("## Histórico de Carreira")
+    st.markdown("""
+    <div class="timeline-item">
+        <h3 style="margin:0; color:#F8FAFC;">Professor de Tecnologia e Matemática</h3>
+        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Secretaria da Educação | Campo Limpo Paulista - SP</span><br>
+        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Outubro 2025 – Fevereiro 2026</span>
+    </div>
+    <div class="timeline-item">
+        <h3 style="margin:0; color:#F8FAFC;">Consultor SAP Jr</h3>
+        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Stefanini | Atuação Remota</span><br>
+        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Escopo de Projeto</span>
+    </div>
+    <div class="timeline-item">
+        <h3 style="margin:0; color:#F8FAFC;">Estagiário de Tecnologia da Informação</h3>
+        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Continental Automotive | Várzea Paulista - SP</span><br>
+        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Junho 2023 – Fevereiro 2025</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ==========================================
+# --- ABA 3: CONHECIMENTOS TÉCNICOS ---
+# ==========================================
+with aba_conhecimentos:
+    st.markdown("## Hard Skills & Matriz de Competências")
     
-    menu_adm = st.selectbox("Escolha a Base para Modificar", [
-        "Projetos e Automações", 
-        "Focos de Vagas (Objetivo)", 
-        "Novos Conhecimentos Técnicos",
-        "Especializações e Cursos",
-        "🖼️ Atualizar Foto de Perfil"
-    ])
+    categorias_skills = ["Dados", "RPA", "SAP"]
+    colunas_skills = st.columns(3)
     
-    # 1. GERENCIAR PROJETOS
-    if menu_adm == "Projetos e Automações":
-        st.subheader("📝 Adicionar Novo Projeto")
-        p_cat = st.selectbox("Categoria", ["Projeto", "Automação"])
-        p_tit = st.text_input("Título")
-        p_des = st.text_area("Descrição")
-        p_l1 = st.text_input("Link do Repositório (GitHub)")
-        p_l2 = st.text_input("Link do Vídeo")
-        
-        if st.button("🚀 Gravar Projeto"):
-            if p_tit and p_des:
-                nl = pd.DataFrame([{"Categoria": p_cat, "Título": p_tit, "Descrição": p_des, "Link do Processo": p_l1, "Link do Vídeo": p_l2}])
-                pd.concat([df_dados, nl], ignore_index=True).to_csv(ARQUIVO_DADOS, index=False)
-                sincronizar_com_github(f"Painel Admin: Adicionado projeto '{p_tit}'")
-                st.success("Salvo com sucesso!")
-                st.rerun()
-                
-        st.subheader("🗑️ Exclusão de Projetos")
-        if not df_dados.empty:
-            item_selecionado = None
-            st.write("Marque o item abaixo na lista que deseja excluir:")
-            
-            # Cria caixas de seleção na frente do nome de cada item
-            for idx, row in df_dados.iterrows():
-                if st.checkbox(f"Apagar: **{row['Título']}** ({row['Categoria']})", key=f"del_proj_{idx}"):
-                    item_selecionado = idx
-            
-            if item_selecionado is not None:
-                if st.button("❌ Confirmar e Apagar Projeto", type="primary"):
-                    titulo_removido = df_dados.loc[item_selecionado, 'Título']
-                    df_dados.drop(item_selecionado).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
-                    sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
-                    st.success(f"'{titulo_removido}' apagado com sucesso!")
-                    st.rerun()
-            else:
-                st.info("Selecione uma caixa acima para liberar o botão de exclusão.")
+    for i, cat in enumerate(categorias_skills):
+        with colunas_skills[i]:
+            st.markdown(f'<div class="skill-section-card"><h3>💡 {cat}</h3>', unsafe_allow_html=True)
+            df_filtrado = df_skills[df_skills["Categoria"] == cat]
+            for _, row in df_filtrado.iterrows():
+                st.markdown(f"""
+                <div class="skill-item">
+                    <div class="skill-name-percentage">
+                        <span>{row['Nome']}</span>
+                        <span>{row['Porcentagem']}%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" style="width: {row['Porcentagem']}%"></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-    # 2. GERENCIAR VAGAS / FOCOS
-    elif menu_adm == "Focos de Vagas (Objetivo)":
-        st.subheader("📝 Inserir Novo Foco de Vaga")
-        v_tit = st.text_input("Área/Vaga")
-        v_des = st.text_area("Descrição Estratégica")
-        
-        if st.button("🚀 Gravar Novo Foco"):
-            if v_tit and v_des:
-                nl = pd.DataFrame([{"Título": v_tit, "Descrição": v_des}])
-                pd.concat([df_vagas, nl], ignore_index=True).to_csv(ARQUIVO_VAGAS, index=False)
-                sincronizar_com_github(f"Painel Admin: Adicionado foco de vaga '{v_tit}'")
-                st.success("Foco Adicionado!")
-                st.rerun()
-                
-        st.subheader("🗑️ Remover Focos Existentes")
-        if not df_vagas.empty:
-            item_selecionado = None
-            for idx, row in df_vagas.iterrows():
-                if st.checkbox(f"Apagar: **{row['Título']}**", key=f"del_vaga_{idx}"):
-                    item_selecionado = idx
-                    
-            if item_selecionado is not None:
-                if st.button("❌ Confirmar e Apagar Foco", type="primary"):
-                    foco_removido = df_vagas.loc[item_selecionado, 'Título']
-                    df_vagas.drop(item_selecionado).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
-                    sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
-                    st.success(f"'{foco_removido}' apagado!")
+    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
+    if st.session_state["autenticado"]:
+        st.markdown("<br><hr><h2>🔒 Gerenciar Novos Conhecimentos Técnicos</h2>", unsafe_allow_html=True)
+        col_s1, col_s2 = st.columns([1, 2])
+        with col_s1:
+            st.subheader("📝 Inserir Nova Skill")
+            s_cat = st.selectbox("Categoria", ["Dados", "RPA", "SAP"], key="aba_skill_cat")
+            s_nom = st.text_input("Nome do Conhecimento", key="aba_skill_nom")
+            s_pct = st.slider("Porcentagem de Domínio", 0, 100, 80, key="aba_skill_pct")
+            if st.button("🚀 Gravar Skill", key="aba_skill_save"):
+                if s_nom:
+                    nl = pd.DataFrame([{"Categoria": s_cat, "Nome": s_nom, "Porcentagem": s_pct}])
+                    pd.concat([df_skills, nl], ignore_index=True).to_csv(ARQUIVO_SKILLS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Adicionada skill '{s_nom}'")
+                    st.success("Skill Adicionada!")
                     st.rerun()
-            else:
-                st.info("Selecione uma vaga acima para excluir.")
+        with col_s2:
+            st.subheader("🗑️ Remover Skills")
+            if not df_skills.empty:
+                item_skill_sel = None
+                for idx, row in df_skills.iterrows():
+                    if st.checkbox(f"Apagar: **{row['Nome']}** ({row['Categoria']})", key=f"aba_del_skill_{idx}"):
+                        item_skill_sel = idx
+                if item_skill_sel is not None:
+                    if st.button("❌ Confirmar Exclusão de Skill", type="primary", key="aba_skill_del_btn"):
+                        skill_removida = df_skills.loc[item_skill_sel, 'Nome']
+                        df_skills.drop(item_skill_sel).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
+                        sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
+                        st.success("Skill removida!")
+                        st.rerun()
 
-    # 3. GERENCIAR CONHECIMENTOS
-    elif menu_adm == "Novos Conhecimentos Técnicos":
-        st.subheader("📝 Inserir Nova Skill")
-        s_cat = st.selectbox("Categoria", ["Dados", "RPA", "SAP"])
-        s_nom = st.text_input("Nome do Conhecimento")
-        s_pct = st.slider("Porcentagem de Domínio", 0, 100, 80)
-        
-        if st.button("🚀 Gravar Skill"):
-            if s_nom:
-                nl = pd.DataFrame([{"Categoria": s_cat, "Nome": s_nom, "Porcentagem": s_pct}])
-                pd.concat([df_skills, nl], ignore_index=True).to_csv(ARQUIVO_SKILLS, index=False)
-                sincronizar_com_github(f"Painel Admin: Adicionada skill '{s_nom}'")
-                st.success("Skill Adicionada!")
-                st.rerun()
-                
-        st.subheader("🗑️ Remover Skills")
-        if not df_skills.empty:
-            item_selecionado = None
-            for idx, row in df_skills.iterrows():
-                if st.checkbox(f"Apagar: **{row['Nome']}** ({row['Categoria']} - {row['Porcentagem']}%)", key=f"del_skill_{idx}"):
-                    item_selecionado = idx
-                    
-            if item_selecionado is not None:
-                if st.button("❌ Confirmar e Apagar Skill", type="primary"):
-                    skill_removida = df_skills.loc[item_selecionado, 'Nome']
-                    df_skills.drop(item_selecionado).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
-                    sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
-                    st.success(f"'{skill_removida}' apagada!")
-                    st.rerun()
-            else:
-                st.info("Selecione uma skill acima para excluir.")
+# ==========================================
+# --- ABA 4: MEUS PROJETOS ---
+# ==========================================
+with aba_projetos:
+    st.markdown("## Repositório Dinâmico de Projetos")
+    if not df_dados.empty:
+        for index, row in df_dados.iterrows():
+            with st.container():
+                st.markdown(f"""
+                <div class="project-card">
+                    <h3 style="margin-top:0;">🚀 {row['Título']} <span style="font-size:0.8rem; background:#0EA5E9; padding:4px 8px; border-radius:12px; color:white; vertical-align:middle; margin-left:10px;">{row['Categoria']}</span></h3>
+                    <p style="color:#94A3B8; font-size:0.95rem; line-height:1.6;">{row['Descrição']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                col_btn1, col_btn2, _ = st.columns([1, 1, 4])
+                if pd.notna(row['Link do Processo']) and row['Link do Processo'] != "":
+                    col_btn1.link_button("🔗 Código Fonte (GitHub)", row['Link do Processo'], use_container_width=True)
+                if pd.notna(row['Link do Vídeo']) and row['Link do Vídeo'] != "":
+                    col_btn2.link_button("🎥 Demonstração em Vídeo", row['Link do Vídeo'], use_container_width=True)
+                st.markdown("<br>", unsafe_allow_html=True)
+    else:
+        st.info("Nenhum projeto cadastrado no sistema.")
 
-    # 4. GERENCIAR CURSOS E CERTIFICAÇÕES
-    elif menu_adm == "Especializações e Cursos":
-        st.subheader("📝 Adicionar Novo Curso")
-        c_tit = st.text_input("Título do Curso")
-        c_emi = st.text_input("Emissor / Instituição")
-        c_dat = st.text_input("Data de Conclusão")
-        c_des = st.text_area("Descrição")
-        
-        if st.button("🚀 Gravar Novo Curso"):
-            if c_tit and c_emi:
-                nl = pd.DataFrame([{"Título": c_tit, "Emissor": c_emi, "Data": c_dat, "Descrição": c_des}])
-                pd.concat([df_cursos, nl], ignore_index=True).to_csv(ARQUIVO_CURSOS, index=False)
-                sincronizar_com_github(f"Painel Admin: Adicionado curso '{c_tit}'")
-                st.success("Curso salvo!")
-                st.rerun()
-                
-        st.subheader("🗑️ Remover Cursos Existentes")
-        if not df_cursos.empty:
-            item_selecionado = None
-            for idx, row in df_cursos.iterrows():
-                if st.checkbox(f"Apagar: **{row['Título']}** ({row['Emissor']})", key=f"del_curso_{idx}"):
-                    item_selecionado = idx
-                    
-            if item_selecionado is not None:
-                if st.button("❌ Confirmar e Apagar Curso", type="primary"):
-                    curso_removido = df_cursos.loc[item_selecionado, 'Título']
-                    df_cursos.drop(item_selecionado).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
-                    sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
-                    st.success(f"'{curso_removido}' apagado!")
+    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
+    if st.session_state["autenticado"]:
+        st.markdown("<br><hr><h2>🔒 Gerenciar Projetos e Automações</h2>", unsafe_allow_html=True)
+        col_p1, col_p2 = st.columns([1, 2])
+        with col_p1:
+            st.subheader("📝 Adicionar Novo Projeto")
+            p_cat = st.selectbox("Categoria", ["Projeto", "Automação"], key="aba_proj_cat")
+            p_tit = st.text_input("Título", key="aba_proj_tit")
+            p_des = st.text_area("Descrição", key="aba_proj_des")
+            p_l1 = st.text_input("Link do Repositório (GitHub)", key="aba_proj_l1")
+            p_l2 = st.text_input("Link do Vídeo", key="aba_proj_l2")
+            if st.button("🚀 Gravar Projeto", key="aba_proj_save"):
+                if p_tit and p_des:
+                    nl = pd.DataFrame([{"Categoria": p_cat, "Título": p_tit, "Descrição": p_des, "Link do Processo": p_l1, "Link do Vídeo": p_l2}])
+                    pd.concat([df_dados, nl], ignore_index=True).to_csv(ARQUIVO_DADOS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Adicionado projeto '{p_tit}'")
+                    st.success("Projeto salvo!")
                     st.rerun()
-            else:
-                st.info("Selecione um curso acima para excluir.")
+        with col_p2:
+            st.subheader("🗑️ Exclusão de Projetos")
+            if not df_dados.empty:
+                item_proj_sel = None
+                for idx, row in df_dados.iterrows():
+                    if st.checkbox(f"Apagar: **{row['Título']}** ({row['Categoria']})", key=f"aba_del_proj_{idx}"):
+                        item_proj_sel = idx
+                if item_proj_sel is not None:
+                    if st.button("❌ Confirmar e Apagar Projeto", type="primary", key="aba_proj_del_btn"):
+                        titulo_removido = df_dados.loc[item_proj_sel, 'Título']
+                        df_dados.drop(item_proj_sel).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
+                        sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
+                        st.success("Projeto removido!")
+                        st.rerun()
 
-    # 5. ATUALIZAR FOTO DE PERFIL
-    elif menu_adm == "🖼️ Atualizar Foto de Perfil":
-        st.subheader("Substituir Imagem do Perfil")
-        foto_carregada = st.file_uploader("Escolha um arquivo de imagem", type=["jpg", "jpeg", "png"])
-        if foto_carregada is not None:
-            st.image(foto_carregada, width=200)
-            if st.button("💾 Aplicar Nova Imagem ao Perfil", type="primary"):
-                try:
-                    extensoes_limpar = ["*.jpg", "*.jpeg", "*.png"]
-                    for ext in extensoes_limpar:
-                        for arq_antigo in glob.glob(ext):
-                            if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
-                                os.remove(arq_antigo)
-                    nome_padrao_foto = "Foto perfil Matheus.jpg"
-                    with open(nome_padrao_foto, "wb") as f:
-                        f.write(foto_carregada.getbuffer())
-                    sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
-                    st.success("Imagem atualizada!")
+# ==========================================
+# --- ABA 5: CURSES E FORMAÇÃO ---
+# ==========================================
+with aba_formacao:
+    st.markdown("## Certificações & Especializações de Mercado")
+    if not df_cursos.empty:
+        for _, row in df_cursos.iterrows():
+            st.markdown(f"""
+            <div class="course-card">
+                <h3 style="margin:0; font-size:1.1rem; color:#F8FAFC;">{row['Título']}</h3>
+                <span style="color:#38BDF8; font-size:0.9rem; font-weight:500;">{row['Emissor']}</span> | 
+                <span style="color:#64748B; font-size:0.85rem;">{row['Data']}</span>
+                <p style="margin-top:8px; margin-bottom:0; color:#94A3B8; font-size:0.9rem;">{row['Descrição']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Nenhuma certificação listada.")
+
+    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
+    if st.session_state["autenticado"]:
+        st.markdown("<br><hr><h2>🔒 Gerenciar Especializações e Cursos</h2>", unsafe_allow_html=True)
+        col_c1, col_c2 = st.columns([1, 2])
+        with col_c1:
+            st.subheader("📝 Adicionar Novo Curso")
+            c_tit = st.text_input("Título do Curso", key="aba_curso_tit")
+            c_emi = st.text_input("Emissor / Instituição", key="aba_curso_emi")
+            c_dat = st.text_input("Data de Conclusão", key="aba_curso_dat")
+            c_des = st.text_area("Descrição", key="aba_curso_des")
+            if st.button("🚀 Gravar Novo Curso", key="aba_curso_save"):
+                if c_tit and c_emi:
+                    nl = pd.DataFrame([{"Título": c_tit, "Emissor": c_emi, "Data": c_dat, "Descrição": c_des}])
+                    pd.concat([df_cursos, nl], ignore_index=True).to_csv(ARQUIVO_CURSOS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Adicionado curso '{c_tit}'")
+                    st.success("Curso salvo!")
                     st.rerun()
-                except Exception as e:
-                    st.error(f"Erro ao salvar arquivo: {e}")
+        with col_c2:
+            st.subheader("🗑️ Remover Cursos Existentes")
+            if not df_cursos.empty:
+                item_curso_sel = None
+                for idx, row in df_cursos.iterrows():
+                    if st.checkbox(f"Apagar Curso: **{row['Título']}** ({row['Emissor']})", key=f"aba_del_curso_{idx}"):
+                        item_curso_sel = idx
+                if item_curso_sel is not None:
+                    if st.button("❌ Confirmar e Apagar Curso", type="primary", key="aba_curso_del_btn"):
+                        curso_removido = df_cursos.loc[item_curso_sel, 'Título']
+                        df_cursos.drop(item_curso_sel).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
+                        sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
+                        st.success("Curso deletado!")
+                        st.rerun()
