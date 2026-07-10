@@ -23,13 +23,15 @@ SENHA_ADMIN = "@Kayle2023"
 ARQUIVO_DADOS = "dados_portfolio.csv"
 ARQUIVO_VAGAS = "dados_vagas.csv"
 ARQUIVO_SKILLS = "dados_skills.csv"
+ARQUIVO_EDU = "dados_educacao.csv"
 NOME_FOTO = "Foto_Perfil_Matheus.jpg"
 
 # Inicialização de bases
 for arquivo, cols in [
     (ARQUIVO_DADOS, ["Categoria", "Título", "Descrição", "Link do Processo", "Link do Vídeo"]),
     (ARQUIVO_VAGAS, ["Título", "Descrição"]),
-    (ARQUIVO_SKILLS, ["Categoria", "Nome", "Porcentagem"])
+    (ARQUIVO_SKILLS, ["Categoria", "Nome", "Porcentagem"]),
+    (ARQUIVO_EDU, ["Tipo", "Nome", "Instituição", "Ano"])
 ]:
     if not os.path.exists(arquivo):
         pd.DataFrame(columns=cols).to_csv(arquivo, index=False)
@@ -234,47 +236,82 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto foi publicado ainda. Utilize o Painel de Controle para adicionar novos itens.")
 
-# 5. ABA FORMAÇÃO E CURSOS (Cards Diferenciados)
+# 5. ABA FORMAÇÃO E CURSOS (Dinâmica vinda do CSV)
 with aba_formacao:
     st.markdown("### 📚 Histórico Acadêmico e Certificações")
     
-    col_grad, col_cert = st.columns(2)
+    df_edu = pd.read_csv(ARQUIVO_EDU)
     
-    with col_grad:
-        st.markdown("#### 🎓 Graduação")
-        st.markdown("""
-        <div class="custom-card" style="border-left-color: #38BDF8; height: 100%;">
-            <h4 style="margin:0; color:#F8FAFC;">Bacharelado em Tecnologia da Informação</h4>
-            <p style="margin:5px 0; color:#38BDF8; font-weight:bold;">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO (UNIVESP)</p>
-            <p style="margin:0; color:#94A3B8; font-size:0.9rem;"><b>Status:</b> Graduado / Ensino Superior Completo</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with col_cert:
-        st.markdown("#### 📜 Cursos e Certificados Relevantes")
-        certificacoes = [
-            {"nome": "UiPath Academy — Especialização em Automação RPA", "ano": "2024"},
-            {"nome": "KA Solutions — SAP S/4HANA (Formação Funcional)", "ano": "2024"},
-            {"nome": "Udemy — Power BI Avançado e Dashboards", "ano": "2025"},
-            {"nome": "Udemy — Engenharia de Dados Avançada com Python", "ano": "2025"}
-        ]
-        for cert in certificacoes:
-            st.markdown(f"""
-            <div style="background:#1E293B; border:1px solid #334155; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:between; align-items:center;">
-                <div style="color:#E2E8F0; font-size:0.95rem; width:85%;">🔹 {cert['nome']}</div>
-                <div style="color:#38BDF8; font-size:0.85rem; font-weight:bold; width:15%; text-align:right;">{cert['ano']}</div>
+    if df_edu.empty:
+        # Layout Padrão de segurança caso esteja sem registros salvos
+        col_grad, col_cert = st.columns(2)
+        with col_grad:
+            st.markdown("#### 🎓 Graduação")
+            st.markdown("""
+            <div class="custom-card" style="border-left-color: #38BDF8; height: 100%;">
+                <h4 style="margin:0; color:#F8FAFC;">Bacharelado em Tecnologia da Informação</h4>
+                <p style="margin:5px 0; color:#38BDF8; font-weight:bold;">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO (UNIVESP)</p>
+                <p style="margin:0; color:#94A3B8; font-size:0.9rem;"><b>Status:</b> Graduado / Ensino Superior Completo</p>
             </div>
             """, unsafe_allow_html=True)
+            
+        with col_cert:
+            st.markdown("#### 📜 Cursos e Certificados Relevantes")
+            certificacoes = [
+                {"nome": "UiPath Academy — Especialização em Automação RPA", "ano": "2024"},
+                {"nome": "KA Solutions — SAP S/4HANA (Formação Funcional)", "ano": "2024"},
+                {"nome": "Udemy — Power BI Avançado e Dashboards", "ano": "2025"},
+                {"nome": "Udemy — Engenharia de Dados Avançada com Python", "ano": "2025"}
+            ]
+            for cert in certificacoes:
+                st.markdown(f"""
+                <div style="background:#1E293B; border:1px solid #334155; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:between; align-items:center;">
+                    <div style="color:#E2E8F0; font-size:0.95rem; width:85%;">🔹 {cert['nome']}</div>
+                    <div style="color:#38BDF8; font-size:0.85rem; font-weight:bold; width:15%; text-align:right;">{cert['ano']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+    else:
+        # Renderização dinâmica com base no que foi cadastrado
+        col_grad, col_cert = st.columns(2)
+        
+        with col_grad:
+            st.markdown("#### 🎓 Graduação / Acadêmico")
+            df_grad = df_edu[df_edu["Tipo"] == "Graduação"]
+            if not df_grad.empty:
+                for idx, row in df_grad.iterrows():
+                    st.markdown(f"""
+                    <div class="custom-card" style="border-left-color: #38BDF8;">
+                        <h4 style="margin:0; color:#F8FAFC;">{row['Nome']}</h4>
+                        <p style="margin:5px 0; color:#38BDF8; font-weight:bold;">{row['Instituição']}</p>
+                        <p style="margin:0; color:#94A3B8; font-size:0.9rem;"><b>Conclusão/Período:</b> {row['Ano']}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("Nenhuma graduação listada.")
+                
+        with col_cert:
+            st.markdown("#### 📜 Cursos e Certificados Relevantes")
+            df_cursos = df_edu[df_edu["Tipo"] == "Curso / Certificação"]
+            if not df_cursos.empty:
+                for idx, row in df_cursos.iterrows():
+                    st.markdown(f"""
+                    <div style="background:#1E293B; border:1px solid #334155; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="color:#E2E8F0; font-size:0.95rem; width:85%;">🔹 <b>{row['Nome']}</b> ({row['Instituição']})</div>
+                        <div style="color:#38BDF8; font-size:0.85rem; font-weight:bold; width:15%; text-align:right;">{row['Ano']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("Nenhum curso listado.")
 
 
-# --- PAINEL ADMINISTRATIVO (Inalterado, apenas corrigido do erro anterior) ---
+# --- PAINEL ADMINISTRATIVO ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
 
     menu_adm = st.selectbox(
         "Escolha a Base para Modificar",
-        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "🖼️ Atualizar Foto de Perfil"]
+        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "📚 Formações e Cursos", "🖼️ Atualizar Foto de Perfil"]
     )
 
     # 1. GERENCIAR PROJETOS
@@ -374,7 +411,38 @@ if st.session_state["autenticado"]:
         else:
             st.info("Nenhuma skill cadastrada.")
 
-    # 4. ATUALIZAR FOTO DE PERFIL
+    # 4. GERENCIAR FORMAÇÕES E CURSOS
+    elif menu_adm == "Formações e Cursos":
+        st.subheader("📝 Cadastrar Nova Formação Acadêmica ou Curso")
+        e_tipo = st.selectbox("Tipo de Registro", ["Curso / Certificação", "Graduação"])
+        e_nome = st.text_input("Nome da Formação / Curso (Ex: Bacharelado em TI)")
+        e_inst = st.text_input("Instituição (Ex: UNIVESP / Udemy)")
+        e_ano  = st.text_input("Ano / Período (Ex: 2025 / Completo)")
+
+        if st.button("🚀 Gravar Formação/Curso"):
+            if e_nome and e_inst:
+                nl = pd.DataFrame([{"Tipo": e_tipo, "Nome": e_nome, "Instituição": e_inst, "Ano": e_ano}])
+                pd.concat([pd.read_csv(ARQUIVO_EDU), nl], ignore_index=True).to_csv(ARQUIVO_EDU, index=False)
+                st.success("Histórico educacional salvo com sucesso!")
+                st.rerun()
+
+        st.subheader("🗑️ Remover Histórico Educacional")
+        df_edu = pd.read_csv(ARQUIVO_EDU)
+        if not df_edu.empty:
+            st.dataframe(df_edu)
+            idx_ex = st.number_input("Índice do item para apagar:", min_value=0, max_value=len(df_edu)-1, step=1)
+            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão deste registro", key="conf_ex_edu")
+            if st.button("❌ Apagar Registro"):
+                if confirmar_exclusao:
+                    df_edu.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_EDU, index=False)
+                    st.success("Item educacional removido com sucesso!")
+                    st.rerun()
+                else:
+                    st.warning("Marque a caixa de verificação para confirmar.")
+        else:
+            st.info("Nenhum item educacional cadastrado.")
+
+    # 5. ATUALIZAR FOTO DE PERFIL
     elif menu_adm == "🖼️ Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
@@ -386,7 +454,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem atualizada com sucesso!")
+                    st.success("Imagem updated com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
