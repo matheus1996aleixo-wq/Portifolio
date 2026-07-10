@@ -173,7 +173,7 @@ if st.session_state["autenticado"]:
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
         if foto_carregada is not None:
             st.image(foto_carregada, width=200)
-            if st.button("💾 Aplicar
+            if st.button("💾 Aplicar")
                          # --- PAINEL ADMINISTRATIVO ---
 if st.session_state["autenticado"]:
     st.markdown("---")
