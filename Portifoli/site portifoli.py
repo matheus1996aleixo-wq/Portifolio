@@ -26,6 +26,7 @@ ARQUIVO_DADOS = "dados_portfolio.csv"
 ARQUIVO_VAGAS = "dados_vagas.csv"
 ARQUIVO_SKILLS = "dados_skills.csv"
 ARQUIVO_CURSOS = "dados_cursos.csv"
+ARQUIVO_EXPERIENCIAS = "dados_experiencias.csv"
 
 # Inicialização de bases CSV caso não existam
 if not os.path.exists(ARQUIVO_DADOS):
@@ -61,12 +62,20 @@ if not os.path.exists(ARQUIVO_CURSOS):
     ])
     df_cursos_init.to_csv(ARQUIVO_CURSOS, index=False)
 
+if not os.path.exists(ARQUIVO_EXPERIENCIAS):
+    df_exp_init = pd.DataFrame([
+        {"Cargo": "Professor de Tecnologia e Matemática", "Empresa": "Secretaria da Educação | Campo Limpo Paulista - SP", "Periodo": "Outubro 2025 – Fevereiro 2026"},
+        {"Cargo": "Consultor SAP Jr", "Empresa": "Stefanini | Atuação Remota", "Periodo": "Escopo de Projeto"},
+        {"Cargo": "Estagiário de Tecnologia da Informação", "Empresa": "Continental Automotive | Várzea Paulista - SP", "Periodo": "Junho 2023 – Fevereiro 2025"}
+    ])
+    df_exp_init.to_csv(ARQUIVO_EXPERIENCIAS, index=False)
+
 
 # --- FUNÇÃO AUTOMÁTICA DE COMMIT E PUSH NO GIT ---
 def sincronizar_com_github(mensagem_commit="Painel Admin: Sincronização automática de dados"):
     """Adiciona as alterações, commita e envia diretamente ao GitHub remoto."""
     try:
-        subprocess.run(["git", "add", ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS, "*.jpg", "*.png", "*.jpeg"], check=True)
+        subprocess.run(["git", "add", ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS, ARQUIVO_EXPERIENCIAS, "*.jpg", "*.png", "*.jpeg"], check=True)
         subprocess.run(["git", "commit", "-m", mensagem_commit], check=True)
         subprocess.run(["git", "push"], check=True)
         st.toast("🚀 Sincronização automatizada concluída no GitHub!", icon="🔄")
@@ -129,11 +138,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- CARREGAMENTO REATIVO DAS QUATRO BASES ---
+# --- CARREGAMENTO REATIVO DAS CINCO BASES ---
 df_dados = pd.read_csv(ARQUIVO_DADOS)
 df_vagas = pd.read_csv(ARQUIVO_VAGAS)
 df_skills = pd.read_csv(ARQUIVO_SKILLS)
 df_cursos = pd.read_csv(ARQUIVO_CURSOS)
+df_experiencias = pd.read_csv(ARQUIVO_EXPERIENCIAS)
 
 # --- 4. BARRA LATERAL (Sidebar) ---
 with st.sidebar:
@@ -174,7 +184,6 @@ with st.sidebar:
                 st.session_state["autenticado"] = False
                 st.rerun()
             
-            # ATUALIZAÇÃO DE FOTO MOVIDA PARA A SIDEBAR (SÓ APARECE SE LOGADO)
             st.markdown("---")
             st.markdown("### 🖼️ Foto de Perfil")
             foto_carregada = st.file_uploader("Substituir imagem", type=["jpg", "jpeg", "png"], key="side_upload_foto")
@@ -184,13 +193,13 @@ with st.sidebar:
                     try:
                         for ext in ["*.jpg", "*.jpeg", "*.png"]:
                             for arq_antigo in glob.glob(ext):
-                                if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
+                                if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS, ARQUIVO_EXPERIENCIAS]:
                                     os.remove(arq_antigo)
                         nome_padrao_foto = "Foto perfil Matheus.jpg"
                         with open(nome_padrao_foto, "wb") as f:
                             f.write(foto_carregada.getbuffer())
                         sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
-                        st.success("Imagem atualizada!")
+                        st.success("Imagem updated!")
                         st.rerun()
                     except Exception as e:
                         st.error(f"Erro: {e}")
@@ -220,7 +229,6 @@ with aba_sobre:
                 </div>
                 """, unsafe_allow_html=True)
 
-    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
     if st.session_state["autenticado"]:
         st.markdown("<br><hr><h2>🔒 Gerenciar Focos de Vagas (Objetivo)</h2>", unsafe_allow_html=True)
         col_v1, col_v2 = st.columns([1, 2])
@@ -255,23 +263,49 @@ with aba_sobre:
 # ==========================================
 with aba_experiencias:
     st.markdown("## Histórico de Carreira")
-    st.markdown("""
-    <div class="timeline-item">
-        <h3 style="margin:0; color:#F8FAFC;">Professor de Tecnologia e Matemática</h3>
-        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Secretaria da Educação | Campo Limpo Paulista - SP</span><br>
-        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Outubro 2025 – Fevereiro 2026</span>
-    </div>
-    <div class="timeline-item">
-        <h3 style="margin:0; color:#F8FAFC;">Consultor SAP Jr</h3>
-        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Stefanini | Atuação Remota</span><br>
-        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Escopo de Projeto</span>
-    </div>
-    <div class="timeline-item">
-        <h3 style="margin:0; color:#F8FAFC;">Estagiário de Tecnologia da Informação</h3>
-        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Continental Automotive | Várzea Paulista - SP</span><br>
-        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Junho 2023 – Fevereiro 2025</span>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    if not df_experiencias.empty:
+        for idx, row in df_experiencias.iterrows():
+            st.markdown(f"""
+            <div class="timeline-item">
+                <h3 style="margin:0; color:#F8FAFC;">{row['Cargo']}</h3>
+                <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">{row['Empresa']}</span><br>
+                <span style="color:#64748B; font-size:0.85rem; font-weight:500;">{row['Periodo']}</span>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Nenhuma experiência profissional cadastrada.")
+
+    # CONTEXTO GERENCIAL PARA EXPERIÊNCIAS
+    if st.session_state["autenticado"]:
+        st.markdown("<br><hr><h2>🔒 Gerenciar Histórico de Carreira</h2>", unsafe_allow_html=True)
+        col_e1, col_e2 = st.columns([1, 2])
+        with col_e1:
+            st.subheader("📝 Inserir Nova Experiência")
+            e_car = st.text_input("Cargo", key="aba_exp_car")
+            e_emp = st.text_input("Empresa / Instituição", key="aba_exp_emp")
+            e_per = st.text_input("Período (Ex: Junho 2023 – Atual)", key="aba_exp_per")
+            if st.button("🚀 Gravar Experiência", key="aba_exp_save"):
+                if e_car and e_emp:
+                    nl = pd.DataFrame([{"Cargo": e_car, "Empresa": e_emp, "Periodo": e_per}])
+                    pd.concat([df_experiencias, nl], ignore_index=True).to_csv(ARQUIVO_EXPERIENCIAS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Adicionada experiência '{e_car}' na '{e_emp}'")
+                    st.success("Experiência cadastrada!")
+                    st.rerun()
+        with col_e2:
+            st.subheader("🗑️ Remover Experiências")
+            if not df_experiencias.empty:
+                item_exp_sel = None
+                for idx, row in df_experiencias.iterrows():
+                    if st.checkbox(f"Apagar: **{row['Cargo']}** ({row['Empresa']})", key=f"aba_del_exp_{idx}"):
+                        item_exp_sel = idx
+                if item_exp_sel is not None:
+                    if st.button("❌ Confirmar Exclusão de Experiência", type="primary", key="aba_exp_del_btn"):
+                        cargo_removido = df_experiencias.loc[item_exp_sel, 'Cargo']
+                        df_experiencias.drop(item_exp_sel).reset_index(drop=True).to_csv(ARQUIVO_EXPERIENCIAS, index=False)
+                        sincronizar_com_github(f"Painel Admin: Removida experiência '{cargo_removido}'")
+                        st.success("Experiência removida!")
+                        st.rerun()
 
 # ==========================================
 # --- ABA 3: CONHECIMENTOS TÉCNICOS ---
@@ -300,7 +334,6 @@ with aba_conhecimentos:
                 """, unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
     if st.session_state["autenticado"]:
         st.markdown("<br><hr><h2>🔒 Gerenciar Novos Conhecimentos Técnicos</h2>", unsafe_allow_html=True)
         col_s1, col_s2 = st.columns([1, 2])
@@ -354,7 +387,6 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto cadastrado no sistema.")
 
-    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
     if st.session_state["autenticado"]:
         st.markdown("<br><hr><h2>🔒 Gerenciar Projetos e Automações</h2>", unsafe_allow_html=True)
         col_p1, col_p2 = st.columns([1, 2])
@@ -388,7 +420,7 @@ with aba_projetos:
                         st.rerun()
 
 # ==========================================
-# --- ABA 5: CURSES E FORMAÇÃO ---
+# --- ABA 5: CURSOS E FORMAÇÃO ---
 # ==========================================
 with aba_formacao:
     st.markdown("## Certificações & Especializações de Mercado")
@@ -405,7 +437,6 @@ with aba_formacao:
     else:
         st.info("Nenhuma certificação listada.")
 
-    # CONTEXTO GERENCIAL INJETADO DIRETAMENTE NA ABA
     if st.session_state["autenticado"]:
         st.markdown("<br><hr><h2>🔒 Gerenciar Especializações e Cursos</h2>", unsafe_allow_html=True)
         col_c1, col_c2 = st.columns([1, 2])
