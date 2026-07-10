@@ -86,13 +86,21 @@ def obter_imagem_base64_flexivel():
 
 foto_base64 = obter_imagem_base64_flexivel()
 
-# --- TEXTO ESTRUTURADO DO CURRÍCULO ---
+# --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ANEXADO ---
 TEXTO_CURRICULO = """MATHEUS ALEIXO
 Várzea Paulista/SP | matheus.aleixo2020@gmail.com | (11) 97478-0590
 LinkedIn: https://www.linkedin.com/in/matheus-aleixo-299a05247
 
 OBJETIVO ESTRATÉGICO:
-Atuar de forma analítica e consultiva na área de Tecnologia da Informação como Analista de Sistemas, Desenvolvedor ou Analista de Dados / Power BI."""
+Atuar de forma analítica e consultiva na área de Tecnologia da Informação como Analista de Sistemas, Desenvolvedor ou Analista de Dados / Power BI. Foco em aplicar competências analíticas refinadas e estratégias tecnológicas modernas para estruturar dados, desenhar dashboards inteligentes e garantir a governança corporativa de ponta a ponta.
+
+FORMAÇÃO ACADÊMICA:
+- Bacharelado em Tecnologia da Informação - UNIVESP (Ensino Superior Completo / Graduado)
+
+HISTÓRICO PROFISSIONAL:
+1. Professor de Tecnologia e Matemática - Secretaria da Educação | Campo Limpo Paulista - SP (Outubro 2025 – Fevereiro 2026)
+2. Consultor SAP Jr - Stefanini | Atuação Remota (Escopo de Projeto)
+3. Estagiário de Tecnologia da Informação - Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)"""
 
 # --- INJEÇÃO DE ESTILOS CSS PREMIUM ---
 st.markdown("""
@@ -108,7 +116,8 @@ st.markdown("""
     h1 { color: #F8FAFC !important; font-weight: 700 !important; letter-spacing: -0.05em; }
     h2, h3 { color: #38BDF8 !important; font-weight: 600 !important; }
     .focus-card { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 24px; height: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .project-card { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .project-card { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 20px; transition: transform 0.3s ease, border-color 0.3s ease; }
+    .project-card:hover { transform: translateY(-4px); border-color: #38BDF8; box-shadow: 0 10px 20px -10px rgba(56, 189, 248, 0.2); }
     .timeline-item { border-left: 2px solid #38BDF8; padding-left: 20px; margin-bottom: 30px; position: relative; }
     .timeline-item::before { content: ''; position: absolute; width: 14px; height: 14px; background: #0F172A; border: 3px solid #38BDF8; border-radius: 50%; left: -9px; top: 4px; }
     .skill-section-card { background: #1E293B; border: 1px solid #334155; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
@@ -144,17 +153,16 @@ with st.sidebar:
     st.markdown("---")
     
     st.markdown("### 📋 Informações Pessoais")
-    st.markdown("**📅 Nascimento:** 20/02/1996")
     st.markdown("**📍 Localização:** Várzea Paulista - SP")
-    st.markdown("**💼 Disponibilidade:** Remoto / Híbrido / Presencial")
     st.markdown("**✉️ E-mail:** [matheus.aleixo2020@gmail.com](mailto:matheus.aleixo2020@gmail.com)")
     st.markdown("**🔗 LinkedIn:** [Acessar Perfil](https://www.linkedin.com/in/matheus-aleixo-299a05247)")
     
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br><br><br><br>", unsafe_allow_html=True)
     with st.expander("🛠️ Configurações de Sistema", expanded=False):
+        # Correção aqui: Remoção das Keys estáticas para evitar o comportamento reativo de perda do formulário
         if not st.session_state["autenticado"]:
-            input_user = st.text_input("User ID", key="adm_user")
-            input_pass = st.text_input("Chave", type="password", key="adm_pass")
+            input_user = st.text_input("User ID")
+            input_pass = st.text_input("Chave", type="password")
             if st.button("🔑 Autenticar"):
                 if input_user == USUARIO_ADMIN and input_pass == SENHA_ADMIN:
                     st.session_state["autenticado"] = True
@@ -166,27 +174,44 @@ with st.sidebar:
             if st.button("🔒 Efetuar Logoff / Sair", type="primary"):
                 st.session_state["autenticado"] = False
                 st.rerun()
+            
+            # ATUALIZAÇÃO DE FOTO MOVIDA PARA A SIDEBAR (SÓ APARECE SE LOGADO)
+            st.markdown("---")
+            st.markdown("### 🖼️ Foto de Perfil")
+            foto_carregada = st.file_uploader("Substituir imagem", type=["jpg", "jpeg", "png"], key="side_upload_foto")
+            if foto_carregada is not None:
+                st.image(foto_carregada, width=100)
+                if st.button("💾 Aplicar Foto", type="primary", key="btn_save_photo"):
+                    try:
+                        for ext in ["*.jpg", "*.jpeg", "*.png"]:
+                            for arq_antigo in glob.glob(ext):
+                                if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
+                                    os.remove(arq_antigo)
+                        nome_padrao_foto = "Foto perfil Matheus.jpg"
+                        with open(nome_padrao_foto, "wb") as f:
+                            f.write(foto_carregada.getbuffer())
+                        sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
+                        st.success("Imagem updated!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro: {e}")
 
 # --- 5. CABEÇALHO DO SITE ---
 st.title("💻 M. Aleixo TI")
 st.markdown("<p style='font-size: 1.2rem; color: #94A3B8; max-width: 900px;'>Especialista no desenvolvimento de automações (RPA), engenharia de pipelines de dados ETL, análises corporativas em Power BI e suporte técnico/funcional a ecossistemas ERP SAP.</p>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Configuração das Abas Principais
 aba_sobre, aba_experiencias, aba_conhecimentos, aba_projetos, aba_formacao = st.tabs([
-    "👤 Objetivo & Foco", 
-    "💼 Trajetória Profissional", 
-    "🧠 Conhecimentos Técnicos",
-    "🚀 Meus Projetos", 
-    "📚 Cursos e Formação"
+    "👤 Objetivo & Foco", "💼 Trajetória Profissional", "🧠 Conhecimentos Técnicos", "🚀 Meus Projetos", "📚 Cursos e Formação"
 ])
 
-# --- ABA: OBJETIVO & FOCO ---
+# ==========================================
+# --- ABA 1: OBJETIVO & FOCO ---
+# ==========================================
 with aba_sobre:
     st.markdown("## Perfil e Objetivo Estratégico")
     st.markdown("Atuar de forma analítica e consultiva na área de **Tecnologia da Informação como Analista de Sistemas, Desenvolvedor ou Analista de Dados / Power BI**.")
     st.markdown("<br>", unsafe_allow_html=True)
-    
     if not df_vagas.empty:
         colunas_vagas = st.columns(len(df_vagas))
         for idx, row in df_vagas.iterrows():
@@ -221,22 +246,32 @@ with aba_sobre:
                 sincronizar_com_github("Painel Admin: Removido foco de vaga")
                 st.rerun()
 
-# --- ABA: TRAJETÓRIA PROFISSIONAL ---
+# ==========================================
+# --- ABA 2: TRAJETÓRIA PROFISSIONAL ---
+# ==========================================
 with aba_experiencias:
     st.markdown("## Histórico de Carreira")
     st.markdown("""
     <div class="timeline-item">
         <h3 style="margin:0; color:#F8FAFC;">Professor de Tecnologia e Matemática</h3>
-        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Secretaria da Educação</span><br>
+        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Secretaria da Educação | Campo Limpo Paulista - SP</span><br>
         <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Outubro 2025 – Fevereiro 2026</span>
     </div>
     <div class="timeline-item">
         <h3 style="margin:0; color:#F8FAFC;">Consultor SAP Jr</h3>
         <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Stefanini</span><br>
+        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Atuação Remota (Escopo de Projeto)</span>
+    </div>
+    <div class="timeline-item">
+        <h3 style="margin:0; color:#F8FAFC;">Estagiário de Tecnologia da Informação</h3>
+        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Continental Automotive | Várzea Paulista - SP</span><br>
+        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Junho 2023 – Fevereiro 2025</span>
     </div>
     """, unsafe_allow_html=True)
 
-# --- ABA: CONHECIMENTOS TÉCNICOS ---
+# ==========================================
+# --- ABA 3: CONHECIMENTOS TÉCNICOS ---
+# ==========================================
 with aba_conhecimentos:
     st.markdown("## Hard Skills & Matriz de Competências")
     col_k1, col_k2 = st.columns(2)
@@ -270,7 +305,9 @@ with aba_conhecimentos:
                 sincronizar_com_github("Painel Admin: Removida skill")
                 st.rerun()
 
-# --- ABA: MEUS PROJETOS ---
+# ==========================================
+# --- ABA 4: MEUS PROJETOS ---
+# ==========================================
 with aba_projetos:
     st.markdown("## Repositório Dinâmico de Projetos")
     if not df_dados.empty:
@@ -308,12 +345,31 @@ with aba_projetos:
                 sincronizar_com_github("Painel Admin: Removido projeto")
                 st.rerun()
 
-# --- ABA: CURSOS E FORMAÇÃO ---
+# ==========================================
+# --- ABA 5: CURSOS E FORMAÇÃO ---
+# ==========================================
 with aba_formacao:
+    st.markdown("## Acadêmico")
+    st.markdown("""
+    <div class="course-card">
+        <h3 style="margin:0; color:#F8FAFC;">Graduação em Bacharelado em Tecnologia da Informação</h3>
+        <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">UNIVESP - Universidade Virtual do Estado de São Paulo</span><br>
+        <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Status: Ensino Superior Completo / Graduado</span>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("## Certificações & Especializações de Mercado")
     if not df_cursos.empty:
         for _, row in df_cursos.iterrows():
-            st.markdown(f"**{row['Título']}** — {row['Emissor']}")
+            # Correção aqui: Formatação visual robusta usando os cards estilizados com CSS
+            st.markdown(f"""
+            <div class="course-card">
+                <h4 style="margin:0; color:#F8FAFC;">{row['Título']}</h4>
+                <span style="color:#38BDF8; font-size:0.9rem; font-weight:600;">{row['Emissor']}</span> | 
+                <span style="color:#64748B; font-size:0.85rem;">{row['Data']}</span>
+                <p style="margin-top:8px; font-size:0.9rem; color:#94A3B8;">{row['Descrição']}</p>
+            </div>
+            """, unsafe_allow_html=True)
     else:
         st.info("Nenhuma certificação cadastrada.")
 
