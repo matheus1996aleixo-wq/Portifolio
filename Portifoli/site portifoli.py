@@ -62,7 +62,7 @@ def obter_imagem_base64_flexivel():
 
 foto_base64 = obter_imagem_base64_flexivel()
 
-# --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ANEXADO ---
+# --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ATUALIZADO ---
 TEXTO_CURRICULO = """MATHEUS ALEIXO
 Várzea Paulista/SP | matheus.aleixo2020@gmail.com | (11) 97478-0590
 LinkedIn: www.linkedin.com/in/matheus-aleixo-299a05247
@@ -84,7 +84,7 @@ HISTÓRICO PROFISSIONAL:
 
 3. Estagiário de Tecnologia da Informação - Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)
    • Atuação direta em suporte funcional SAP ECC nos módulos Basis, MM, FI, CO e SD, atendendo fluxos de Procure-to-Pay (P2P).
-   • Projeto SPIRIT: Participação ativa na iniciativa global da Continental de harmonização dos ambientes e consolidação de servidores SAP do grupo.
+   • Projeto SPIRIT: Participação activa na iniciativa global da Continental de harmonização dos ambientes e consolidação de servidores SAP do grupo.
    • Atuação analítica com a solução fiscal Guepardo (extração de relatórios, análises em debug do sistema e transporte de requests).
 
 COMPETÊNCIAS TÉCNICAS:
@@ -313,7 +313,7 @@ with aba_experiencias:
         <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Secretaria da Educação | Campo Limpo Paulista - SP</span><br>
         <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Outubro 2025 – Fevereiro 2026</span>
         <p style="color:#94A3B8; font-size:0.95rem; margin-top:8px; line-height:1.6;">
-            • Condução e liderança de turmas focando no raciocínio lógico, abstraction e competências digitais.<br>
+            • Condução e liderança de turmas focando no raciocínio lógico, abstração e competências digitais.<br>
             • Mediação ativa de cronogramas digitais de ensino e uso estratégico de ferramentas de TI aplicadas à educação.
         </p>
     </div>
@@ -422,7 +422,7 @@ with aba_formacao:
         </div>
         """, unsafe_allow_html=True)
 
-# --- PANEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO (EXIBIDO APENAS SE AUTENTICADO) ---
+# --- PAINEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO (EXIBIDO APENAS SE AUTENTICADO) ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
@@ -507,7 +507,6 @@ if st.session_state["autenticado"]:
         foto_carregada = st.file_uploader("Escolha um arquivo de imagem", type=["jpg", "jpeg", "png"])
         
         if foto_carregada is not None:
-            # Mostra um preview temporário para conferência
             st.image(foto_carregada, width=200, caption="Pré-visualização do arquivo selecionado")
             
             if st.button("💾 Aplicar Nova Imagem ao Perfil", type="primary"):
@@ -516,7 +515,7 @@ if st.session_state["autenticado"]:
                     extensoes_limpar = ["*.jpg", "*.jpeg", "*.png"]
                     for ext in extensoes_limpar:
                         for arq_antigo in glob.glob(ext):
-                            if arq_antigo != "dados_portfolio.csv" and arq_antigo != "dados_vagas.csv" and arq_antigo != "dados_skills.csv":
+                            if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS]:
                                 os.remove(arq_antigo)
                                 
                     # Salva o novo arquivo
@@ -524,7 +523,7 @@ if st.session_state["autenticado"]:
                     with open(nome_padrao_foto, "wb") as f:
                         f.write(foto_carregada.getbuffer())
                         
-                    st.success("✨ Imagem updated com sucesso! Recarregando a interface...")
+                    st.success("✨ Imagem atualizada com sucesso! Recarregando a interface...")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar arquivo: {e}")
