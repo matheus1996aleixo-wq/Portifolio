@@ -170,7 +170,7 @@ with aba_experiencias:
         </div>
         """, unsafe_allow_html=True)
 
-# 3. ABA CONHECIMENTOS
+# 3. ABA CONHECIMENTOS (Com verificação de emojis dinâmicos)
 with aba_conhecimentos:
     st.markdown("### 🧠 Hard Skills & Nível de Domínio")
     
@@ -199,6 +199,8 @@ with aba_conhecimentos:
             col_alvo = cols_skill[idx % 2]
             with col_alvo:
                 nome_skill = row['Nome']
+                
+                # Verificação dinâmica de palavras-chave para atribuição de emojis
                 emoji_adicional = ""
                 if "python" in nome_skill.lower():
                     emoji_adicional = " 🐍"
@@ -235,7 +237,7 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto foi publicado ainda. Utilize o Painel de Controle para adicionar novos itens.")
 
-# 5. ABA FORMAÇÃO E CURSOS
+# 5. ABA FORMAÇÃO E CURSOS (Com os novos cursos inclusos no padrão básico)
 with aba_formacao:
     st.markdown("### 📚 Histórico Acadêmico e Certificações")
     df_edu = pd.read_csv(ARQUIVO_EDU)
@@ -272,8 +274,6 @@ with aba_formacao:
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
-    
-    # Nota de persistência local adicionada conforme solicitado
     st.info("💾 **Nota de Persistência:** Todas as modificações feitas neste painel salvam diretamente nos bancos de dados locais (`.csv`). Os itens permanecerão salvos por tempo indeterminado e só sumirão se forem explicitamente excluídos ou trocados aqui no Painel Administrativo.")
 
     menu_adm = st.selectbox(
@@ -427,7 +427,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem atualizada com sucesso!")
+                    st.success("Imagem updated com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
