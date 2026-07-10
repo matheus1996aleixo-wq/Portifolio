@@ -63,18 +63,18 @@ if not os.path.exists(ARQUIVO_CURSOS):
 
 
 # --- FUNÇÃO AUTOMÁTICA DE COMMIT E PUSH NO GIT ---
-def sincronizar_com_github(mensagem_commit="Painel Admin: Atualização de dados corporativos"):
-    """Executa comandos do Git via subprocess para persistir e subir dados ao repositório remoto."""
+def sincronizar_com_github(mensagem_commit="Painel Admin: Sincronização automática de dados"):
+    """Adiciona as alterações, commita e envia diretamente ao GitHub remoto."""
     try:
-        # Adiciona arquivos modificados (CSVs e Imagens)
+        # Adiciona arquivos CSVs modificados e quaisquer extensões comuns de imagens
         subprocess.run(["git", "add", ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS, "*.jpg", "*.png", "*.jpeg"], check=True)
-        # Executa o Commit
+        # Executa o Commit local com mensagem contextualizada
         subprocess.run(["git", "commit", "-m", mensagem_commit], check=True)
-        # Faz o Push para o branch atual
+        # Faz o Push para o servidor do GitHub
         subprocess.run(["git", "push"], check=True)
-        st.toast("🚀 Alterações sincronizadas com o GitHub com sucesso!", icon="🔄")
+        st.toast("🚀 Sincronização automatizada concluída no GitHub!", icon="🔄")
     except subprocess.CalledProcessError as e:
-        st.error(f"Erro ao sincronizar com o GitHub. Certifique-se de que o Git está configurado no servidor: {e}")
+        st.error(f"Falha de sincronização automática com o GitHub. Certifique-se de que o Git local está configurado: {e}")
 
 
 # --- FUNÇÃO AUXILIAR DE RENDERIZAÇÃO DA IMAGEM ---
@@ -89,10 +89,10 @@ def obter_imagem_base64_flexivel():
 
 foto_base64 = obter_imagem_base64_flexivel()
 
-# --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ATUALIZADO ---
+# --- TEXTO ESTRUTURADO DO SEU CURRÍCULO ANEXADO ---
 TEXTO_CURRICULO = """MATHEUS ALEIXO
 Várzea Paulista/SP | matheus.aleixo2020@gmail.com | (11) 97478-0590
-LinkedIn: www.linkedin.com/in/matheus-aleixo-299a05247
+LinkedIn: https://www.linkedin.com/in/matheus-aleixo-299a05247
 
 OBJETIVO ESTRATÉGICO:
 Atuar de forma analítica e consultiva na área de Tecnologia da Informação como Analista de Sistemas, Desenvolvedor ou Analista de Dados / Power BI. Foco em aplicar competências analíticas refinadas e estratégias tecnológicas modernas para estruturar dados, desenhar dashboards inteligentes e garantir a governança corporativa de ponta a ponta.
@@ -111,14 +111,14 @@ HISTÓRICO PROFISSIONAL:
 
 3. Estagiário de Tecnologia da Informação - Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)
    • Atuação direta em suporte funcional SAP ECC nos módulos Basis, MM, FI, CO e SD, atendendo fluxos de Procure-to-Pay (P2P).
-   • Projeto SPIRIT: Participação activa na iniciativa global da Continental de harmonização dos ambientes e consolidação de servidores SAP do grupo.
+   • Projeto SPIRIT: Participação activa na initiative global da Continental de harmonização dos ambientes e consolidação de servidores SAP do grupo.
    • Atuação analítica com a solução fiscal Guepardo (extração de relatórios, análises em debug do sistema e transporte de requests).
 
 COMPETÊNCIAS TÉCNICAS:
 - BI & Dados: Power BI Avançado (Dashboards Gerenciais e Modelagem DAX), Bancos de Dados Relacionais (PostgreSQL), Pipelines ETL & Manipulação de Dados (JSON, XML, HTML).
 - Automação (RPA): Python Avançado (Scrapy, Playwright, BeautifulSoup), Plataforma de Robótica UiPath.
 - ERP Integrado: Suporte Funcional SAP (ECC e S/4HANA), Módulos FI, CO, SD, MM, Basis, ABAP debug e Solução Fiscal Guepardo.
-- Práticas de Nuvem: Controle de versão distribuído via Git/GitHub, noções de escalabilidade serverless in nuvem (AWS Lambda / EventBridge) e orquestradores de fluxo (Apache Airflow)."""
+- Práticas de Nuvem: Controle de versão distribuído via Git/GitHub, noções de escalabilidade serverless em nuvem (AWS Lambda / EventBridge) e orquestradores de fluxo (Apache Airflow)."""
 
 # --- INJEÇÃO DE ESTILOS CSS PREMIUM ---
 st.markdown("""
@@ -340,7 +340,7 @@ with aba_experiencias:
         <span style="color:#38BDF8; font-size:0.95rem; font-weight:600;">Secretaria da Educação | Campo Limpo Paulista - SP</span><br>
         <span style="color:#64748B; font-size:0.85rem; font-weight:500;">Outubro 2025 – Fevereiro 2026</span>
         <p style="color:#94A3B8; font-size:0.95rem; margin-top:8px; line-height:1.6;">
-            • Condução e liderança de turmas focando no raciocínio lógico, abstração e competências digitais.<br>
+            • Condução e liderança de turmas focando no raciocínio lógico, abstraction e competências digitais.<br>
             • Mediação ativa de cronogramas digitais de ensino e uso estratégico de ferramentas de TI aplicadas à educação.
         </p>
     </div>
@@ -398,7 +398,7 @@ with aba_conhecimentos:
 # --- ABA: MEUS PROJETOS ---
 with aba_projetos:
     st.markdown("## Repositório Dinâmico de Projetos")
-    st.write("Projetos inseridos e atualizados através do painel restrito administrativo.")
+    st.write("Projetos inseridos e updated através do painel restrito administrativo.")
     st.markdown("<br>", unsafe_allow_html=True)
     
     if not df_dados.empty:
@@ -422,7 +422,7 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto dinâmico publicado.")
 
-# --- ABA: CURSOS E FORMAÇÃO (AGORA TOTALMENTE DINÂMICA) ---
+# --- ABA: CURSOS E FORMAÇÃO ---
 with aba_formacao:
     st.markdown("## Formação Acadêmica Regular")
     st.markdown("""
@@ -446,7 +446,6 @@ with aba_formacao:
             """, unsafe_allow_html=True)
     else:
         st.info("Nenhuma certificação cadastrada.")
-
 
 # --- PAINEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO (COM COMMIT/PUSH AUTOMÁTICO) ---
 if st.session_state["autenticado"]:
@@ -474,7 +473,7 @@ if st.session_state["autenticado"]:
             if p_tit and p_des:
                 nl = pd.DataFrame([{"Categoria": p_cat, "Título": p_tit, "Descrição": p_des, "Link do Processo": p_l1, "Link do Vídeo": p_l2}])
                 pd.concat([df_dados, nl], ignore_index=True).to_csv(ARQUIVO_DADOS, index=False)
-                sincronizar_com_github(f"Painel: Adicionado projeto '{p_tit}'")
+                sincronizar_com_github(f"Painel Admin: Adicionado projeto '{p_tit}'")
                 st.success("Salvo com sucesso e enviado ao GitHub!")
                 st.rerun()
                 
@@ -482,10 +481,15 @@ if st.session_state["autenticado"]:
         if not df_dados.empty:
             st.dataframe(df_dados)
             idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
-            if st.button("❌ Apagar Registro"):
+            
+            # Caixa de confirmação de segurança
+            confirmar_exclusao = st.checkbox("Sim, eu tenho certeza que quero apagar este projeto.", key="confirma_proj")
+            
+            if st.button("❌ Apagar Registro", disabled=not confirmar_exclusao):
                 titulo_removido = df_dados.loc[idx_ex, 'Título']
                 df_dados.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
-                sincronizar_com_github(f"Painel: Removido projeto '{titulo_removido}'")
+                sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
+                st.success(f"Projeto '{titulo_removido}' apagado com sucesso!")
                 st.rerun()
 
     # 2. GERENCIAR VAGAS / FOCOS
@@ -498,17 +502,22 @@ if st.session_state["autenticado"]:
             if v_tit and v_des:
                 nl = pd.DataFrame([{"Título": v_tit, "Descrição": v_des}])
                 pd.concat([df_vagas, nl], ignore_index=True).to_csv(ARQUIVO_VAGAS, index=False)
-                sincronizar_com_github(f"Painel: Adicionado foco de vaga '{v_tit}'")
+                sincronizar_com_github(f"Painel Admin: Adicionado foco de vaga '{v_tit}'")
                 st.success("Foco Adicionado e atualizado no GitHub!")
                 st.rerun()
                 
         st.subheader("🗑️ Remover Focos Existentes")
         st.dataframe(df_vagas)
         idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
-        if st.button("❌ Apagar Foco"):
+        
+        # Caixa de confirmação de segurança
+        confirmar_exclusao = st.checkbox("Sim, eu tenho certeza que quero apagar este foco de vaga.", key="confirma_vaga")
+        
+        if st.button("❌ Apagar Foco", disabled=not confirmar_exclusao):
             foco_removido = df_vagas.loc[idx_ex, 'Título']
             df_vagas.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
-            sincronizar_com_github(f"Painel: Removido foco de vaga '{foco_removido}'")
+            sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
+            st.success(f"Foco '{foco_removido}' apagado com sucesso!")
             st.rerun()
 
     # 3. GERENCIAR CONHECIMENTOS
@@ -522,20 +531,25 @@ if st.session_state["autenticado"]:
             if s_nom:
                 nl = pd.DataFrame([{"Categoria": s_cat, "Nome": s_nom, "Porcentagem": s_pct}])
                 pd.concat([df_skills, nl], ignore_index=True).to_csv(ARQUIVO_SKILLS, index=False)
-                sincronizar_com_github(f"Painel: Adicionada skill '{s_nom}'")
+                sincronizar_com_github(f"Painel Admin: Adicionada skill '{s_nom}'")
                 st.success("Skill Adicionada e sincronizada!")
                 st.rerun()
                 
         st.subheader("🗑️ Remover Skills")
         st.dataframe(df_skills)
         idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
-        if st.button("❌ Apagar Skill"):
+        
+        # Caixa de confirmação de segurança
+        confirmar_exclusao = st.checkbox("Sim, eu tenho certeza que quero apagar esta skill.", key="confirma_skill")
+        
+        if st.button("❌ Apagar Skill", disabled=not confirmar_exclusao):
             skill_removida = df_skills.loc[idx_ex, 'Nome']
             df_skills.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
-            sincronizar_com_github(f"Painel: Removida skill '{skill_removida}'")
+            sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
+            st.success(f"Skill '{skill_removida}' apagada com sucesso!")
             st.rerun()
 
-    # 4. NOVO: GERENCIAR CURSOS E CERTIFICAÇÕES
+    # 4. GERENCIAR CURSOS E CERTIFICAÇÕES
     elif menu_adm == "Especializações e Cursos":
         st.subheader("📝 Adicionar Novo Curso / Certificação")
         c_tit = st.text_input("Título do Curso (Ex: 📊 Excel Avançado)")
@@ -547,20 +561,25 @@ if st.session_state["autenticado"]:
             if c_tit and c_emi:
                 nl = pd.DataFrame([{"Título": c_tit, "Emissor": c_emi, "Data": c_dat, "Descrição": c_des}])
                 pd.concat([df_cursos, nl], ignore_index=True).to_csv(ARQUIVO_CURSOS, index=False)
-                sincronizar_com_github(f"Painel: Adicionado curso '{c_tit}'")
-                st.success("Curso salvo e versionado com sucesso!")
+                sincronizar_com_github(f"Painel Admin: Adicionado curso '{c_tit}'")
+                st.success("Curso saved e versionado com sucesso!")
                 st.rerun()
                 
         st.subheader("🗑️ Remover Cursos Existentes")
         st.dataframe(df_cursos)
         idx_ex = st.number_input("Índice do curso para apagar:", min_value=0, max_value=len(df_cursos)-1, step=1)
-        if st.button("❌ Apagar Curso"):
+        
+        # Caixa de confirmação de segurança
+        confirmar_exclusao = st.checkbox("Sim, eu tenho certeza que quero apagar este curso.", key="confirma_curso")
+        
+        if st.button("❌ Apagar Curso", disabled=not confirmar_exclusao):
             curso_removido = df_cursos.loc[idx_ex, 'Título']
             df_cursos.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
-            sincronizar_com_github(f"Painel: Removido curso '{curso_removido}'")
+            sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
+            st.success(f"Curso '{curso_removido}' apagado com sucesso!")
             st.rerun()
 
-    # 5. ATUALIZAR FOTO DE PERFIL DIRETO PELO SITE (AGORA COM GIT PUSH)
+    # 5. ATUALIZAR FOTO DE PERFIL
     elif menu_adm == "🖼️ Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
         st.write("Selecione sua foto profissional do computador. Ela será renomeada, configurada e enviada ao Git.")
@@ -572,20 +591,20 @@ if st.session_state["autenticado"]:
             
             if st.button("💾 Aplicar Nova Imagem ao Perfil", type="primary"):
                 try:
-                    # Remove arquivos antigos de imagens para evitar conflito com glob
+                    # Remove arquivos antigos de imagens
                     extensoes_limpar = ["*.jpg", "*.jpeg", "*.png"]
                     for ext in extensoes_limpar:
                         for arq_antigo in glob.glob(ext):
                             if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
                                 os.remove(arq_antigo)
                                 
-                    # Salva o novo arquivo localmente
+                    # Salva o arquivo de imagem binário localmente
                     nome_padrao_foto = "Foto perfil Matheus.jpg"
                     with open(nome_padrao_foto, "wb") as f:
                         f.write(foto_carregada.getbuffer())
                         
-                    # Sincroniza a imagem e deleta as antigas no Git remoto
-                    sincronizar_com_github("Painel: Atualização estrutural da foto de perfil profissional")
+                    # Sincroniza com o GitHub
+                    sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
                     st.success("✨ Imagem atualizada e enviada ao GitHub com sucesso!")
                     st.rerun()
                 except Exception as e:
