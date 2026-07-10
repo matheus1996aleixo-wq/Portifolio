@@ -3,6 +3,7 @@ import pandas as pd
 import base64
 import os
 import glob
+import subprocess
 
 # 1. Configurações de Layout da Página
 st.set_page_config(
@@ -24,6 +25,7 @@ SENHA_ADMIN = "@Kayle2023"
 ARQUIVO_DADOS = "dados_portfolio.csv"
 ARQUIVO_VAGAS = "dados_vagas.csv"
 ARQUIVO_SKILLS = "dados_skills.csv"
+ARQUIVO_CURSOS = "dados_cursos.csv"
 
 # Inicialização de bases CSV caso não existam
 if not os.path.exists(ARQUIVO_DADOS):
@@ -49,6 +51,31 @@ if not os.path.exists(ARQUIVO_SKILLS):
         {"Categoria": "SAP", "Nome": "Solução Fiscal Integrada Guepardo", "Porcentagem": 85}
     ])
     df_skills_init.to_csv(ARQUIVO_SKILLS, index=False)
+
+if not os.path.exists(ARQUIVO_CURSOS):
+    df_cursos_init = pd.DataFrame([
+        {"Título": "📊 Power BI Avançado", "Emissor": "Plataforma Udemy", "Data": "Conclusão: 31/07/2025", "Descrição": "Construção de arquiteturas corporativas de BI e dashboards estratégicos."},
+        {"Título": "🐍 Python Avançado", "Emissor": "Plataforma Udemy", "Data": "Conclusão: 30/12/2025", "Descrição": "Estruturas de algoritmos, raspagem complexa e pipelines ETL."},
+        {"Título": "🤖 Formação Profissional em Automação", "Emissor": "UiPath Academy de Automação e Desenvolvimento", "Data": "Conclusão: 21/04/2024", "Descrição": "Modelagem, testes e governança de robôs (RPA) industriais."},
+        {"Título": "🏢 Fundamentos Básicos do SAP S/4HANA", "Emissor": "KA Solutions", "Data": "Carga Horária: 8 horas", "Descrição": "Arquitetura estrutural base de sistemas integrados ERP."}
+    ])
+    df_cursos_init.to_csv(ARQUIVO_CURSOS, index=False)
+
+
+# --- FUNÇÃO AUTOMÁTICA DE COMMIT E PUSH NO GIT ---
+def sincronizar_com_github(mensagem_commit="Painel Admin: Sincronização automática de dados"):
+    """Adiciona as alterações, commita e envia diretamente ao GitHub remoto."""
+    try:
+        # Adiciona arquivos CSVs modificados e quaisquer extensões comuns de imagens
+        subprocess.run(["git", "add", ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS, "*.jpg", "*.png", "*.jpeg"], check=True)
+        # Executa o Commit local com mensagem contextualizada
+        subprocess.run(["git", "commit", "-m", mensagem_commit], check=True)
+        # Faz o Push para o servidor do GitHub
+        subprocess.run(["git", "push"], check=True)
+        st.toast("🚀 Sincronização automatizada concluída no GitHub!", icon="🔄")
+    except subprocess.CalledProcessError as e:
+        st.error(f"Falha de sincronização automática com o GitHub. Certifique-se de que o Git local está configurado: {e}")
+
 
 # --- FUNÇÃO AUXILIAR DE RENDERIZAÇÃO DA IMAGEM ---
 def obter_imagem_base64_flexivel():
@@ -208,10 +235,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- CARREGAMENTO REATIVO DAS TRÊS BASES ---
+# --- CARREGAMENTO REATIVO DAS QUATRO BASES ---
 df_dados = pd.read_csv(ARQUIVO_DADOS)
 df_vagas = pd.read_csv(ARQUIVO_VAGAS)
 df_skills = pd.read_csv(ARQUIVO_SKILLS)
+df_cursos = pd.read_csv(ARQUIVO_CURSOS)
 
 # --- 4. BARRA LATERAL (Sidebar) ---
 with st.sidebar:
@@ -292,7 +320,6 @@ with aba_sobre:
     )
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Renderização dinâmica dos Cards de Objetivos/Vagas a partir do arquivo local
     if not df_vagas.empty:
         colunas_vagas = st.columns(len(df_vagas))
         for idx, row in df_vagas.iterrows():
@@ -371,7 +398,7 @@ with aba_conhecimentos:
 # --- ABA: MEUS PROJETOS ---
 with aba_projetos:
     st.markdown("## Repositório Dinâmico de Projetos")
-    st.write("Projetos inseridos e atualizados através do painel restrito administrativo.")
+    st.write("Projetos inseridos e updated através do painel restrito administrativo.")
     st.markdown("<br>", unsafe_allow_html=True)
     
     if not df_dados.empty:
@@ -395,7 +422,7 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto dinâmico publicado.")
 
-# --- ABA: CURSOS E FORMAÇÃO ---
+# --- ABA: CURSOS E FORMAÇÃO (AGORA TOTALMENTE DINÂMICA) ---
 with aba_formacao:
     st.markdown("## Formação Acadêmica Regular")
     st.markdown("""
@@ -407,22 +434,20 @@ with aba_formacao:
     """, unsafe_allow_html=True)
     
     st.markdown("## Certificações & Especializações de Mercado")
-    cursos = [
-        ("📊 Power BI Avançado", "Plataforma Udemy", "Conclusão: 31/07/2025", "Construção de arquiteturas corporativas de BI e dashboards estratégicos."),
-        ("🐍 Python Avançado", "Plataforma Udemy", "Conclusão: 30/12/2025", "Estruturas de algoritmos, raspagem complexa e pipelines ETL."),
-        ("🤖 Formação Profissional em Automação", "UiPath Academy de Automação e Desenvolvimento", "Conclusão: 21/04/2024", "Modelagem, testes e governança de robôs (RPA) industriais."),
-        ("🏢 Fundamentos Básicos do SAP S/4HANA", "KA Solutions", "Carga Horária: 8 horas", "Arquitetura estrutural base de sistemas integrados ERP.")
-    ]
-    for titulo, emissor, data, desc in cursos:
-        st.markdown(f"""
-        <div class="course-card">
-            <strong style="color:#F8FAFC; font-size:1.05rem;">{titulo}</strong><br>
-            <span style="color:#38BDF8; font-size:0.9rem;">{emissor} — <small style="color:#64748B;">{data}</small></span>
-            <p style="margin:6px 0 0 0; color:#94A3B8; font-size:0.9rem;">{desc}</p>
-        </div>
-        """, unsafe_allow_html=True)
+    
+    if not df_cursos.empty:
+        for _, row in df_cursos.iterrows():
+            st.markdown(f"""
+            <div class="course-card">
+                <strong style="color:#F8FAFC; font-size:1.05rem;">{row['Título']}</strong><br>
+                <span style="color:#38BDF8; font-size:0.9rem;">{row['Emissor']} — <small style="color:#64748B;">{row['Data']}</small></span>
+                <p style="margin:6px 0 0 0; color:#94A3B8; font-size:0.9rem;">{row['Descrição']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Nenhuma certificação cadastrada.")
 
-# --- PANEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO (EXIBIDO APENAS SE AUTENTICADO) ---
+# --- PAINEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO (COM COMMIT/PUSH AUTOMÁTICO) ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
@@ -431,6 +456,7 @@ if st.session_state["autenticado"]:
         "Projetos e Automações", 
         "Focos de Vagas (Objetivo)", 
         "Novos Conhecimentos Técnicos",
+        "Especializações e Cursos",
         "🖼️ Atualizar Foto de Perfil"
     ])
     
@@ -447,7 +473,8 @@ if st.session_state["autenticado"]:
             if p_tit and p_des:
                 nl = pd.DataFrame([{"Categoria": p_cat, "Título": p_tit, "Descrição": p_des, "Link do Processo": p_l1, "Link do Vídeo": p_l2}])
                 pd.concat([df_dados, nl], ignore_index=True).to_csv(ARQUIVO_DADOS, index=False)
-                st.success("Salvo com sucesso!")
+                sincronizar_com_github(f"Painel Admin: Adicionado projeto '{p_tit}'")
+                st.success("Salvo com sucesso e enviado ao GitHub!")
                 st.rerun()
                 
         st.subheader("🗑️ Exclusão de Projetos")
@@ -455,7 +482,9 @@ if st.session_state["autenticado"]:
             st.dataframe(df_dados)
             idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
             if st.button("❌ Apagar Registro"):
+                titulo_removido = df_dados.loc[idx_ex, 'Título']
                 df_dados.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
+                sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
                 st.rerun()
 
     # 2. GERENCIAR VAGAS / FOCOS
@@ -468,14 +497,17 @@ if st.session_state["autenticado"]:
             if v_tit and v_des:
                 nl = pd.DataFrame([{"Título": v_tit, "Descrição": v_des}])
                 pd.concat([df_vagas, nl], ignore_index=True).to_csv(ARQUIVO_VAGAS, index=False)
-                st.success("Foco Adicionado!")
+                sincronizar_com_github(f"Painel Admin: Adicionado foco de vaga '{v_tit}'")
+                st.success("Foco Adicionado e atualizado no GitHub!")
                 st.rerun()
                 
         st.subheader("🗑️ Remover Focos Existentes")
         st.dataframe(df_vagas)
         idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
         if st.button("❌ Apagar Foco"):
+            foco_removido = df_vagas.loc[idx_ex, 'Título']
             df_vagas.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
+            sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
             st.rerun()
 
     # 3. GERENCIAR CONHECIMENTOS
@@ -489,42 +521,71 @@ if st.session_state["autenticado"]:
             if s_nom:
                 nl = pd.DataFrame([{"Categoria": s_cat, "Nome": s_nom, "Porcentagem": s_pct}])
                 pd.concat([df_skills, nl], ignore_index=True).to_csv(ARQUIVO_SKILLS, index=False)
-                st.success("Skill Adicionada!")
+                sincronizar_com_github(f"Painel Admin: Adicionada skill '{s_nom}'")
+                st.success("Skill Adicionada e sincronizada!")
                 st.rerun()
                 
         st.subheader("🗑️ Remover Skills")
         st.dataframe(df_skills)
         idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
         if st.button("❌ Apagar Skill"):
+            skill_removida = df_skills.loc[idx_ex, 'Nome']
             df_skills.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
+            sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
             st.rerun()
 
-    # 4. ATUALIZAR FOTO DE PERFIL DIRETO PELO SITE
+    # 4. GERENCIAR CURSOS E CERTIFICAÇÕES
+    elif menu_adm == "Especializações e Cursos":
+        st.subheader("📝 Adicionar Novo Curso / Certificação")
+        c_tit = st.text_input("Título do Curso (Ex: 📊 Excel Avançado)")
+        c_emi = st.text_input("Emissor / Instituição (Ex: Fundação Bradesco)")
+        c_dat = st.text_input("Data de Conclusão / Carga Horária (Ex: Conclusão: 12/10/2026)")
+        c_des = st.text_area("Breve Descrição do Aprendizado")
+        
+        if st.button("🚀 Gravar Novo Curso"):
+            if c_tit and c_emi:
+                nl = pd.DataFrame([{"Título": c_tit, "Emissor": c_emi, "Data": c_dat, "Descrição": c_des}])
+                pd.concat([df_cursos, nl], ignore_index=True).to_csv(ARQUIVO_CURSOS, index=False)
+                sincronizar_com_github(f"Painel Admin: Adicionado curso '{c_tit}'")
+                st.success("Curso salvo e versionado com sucesso!")
+                st.rerun()
+                
+        st.subheader("🗑️ Remover Cursos Existentes")
+        st.dataframe(df_cursos)
+        idx_ex = st.number_input("Índice do curso para apagar:", min_value=0, max_value=len(df_cursos)-1, step=1)
+        if st.button("❌ Apagar Curso"):
+            curso_removido = df_cursos.loc[idx_ex, 'Título']
+            df_cursos.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
+            sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
+            st.rerun()
+
+    # 5. ATUALIZAR FOTO DE PERFIL DIRETO PELO SITE (AGORA INTEGRADO AO REPOSITÓRIO REMOTO)
     elif menu_adm == "🖼️ Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
-        st.write("Selecione sua foto profissional do computador. Ela será renomeada e configurada automaticamente.")
+        st.write("Selecione sua foto profissional do computador. Ela será renomeada, configurada e enviada ao Git.")
         
         foto_carregada = st.file_uploader("Escolha um arquivo de imagem", type=["jpg", "jpeg", "png"])
         
         if foto_carregada is not None:
-            # Mostra um preview temporário para referência
             st.image(foto_carregada, width=200, caption="Pré-visualização do arquivo selecionado")
             
             if st.button("💾 Aplicar Nova Imagem ao Perfil", type="primary"):
                 try:
-                    # Remove arquivos antigos de imagens para evitar conflito com glob
+                    # Remove arquivos antigos de imagens para evitar duplicidade ou conflito com o glob
                     extensoes_limpar = ["*.jpg", "*.jpeg", "*.png"]
                     for ext in extensoes_limpar:
                         for arq_antigo in glob.glob(ext):
-                            if arq_antigo != "dados_portfolio.csv" and arq_antigo != "dados_vagas.csv" and arq_antigo != "dados_skills.csv":
+                            if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
                                 os.remove(arq_antigo)
                                 
-                    # Salva o novo arquivo
+                    # Salva o arquivo de imagem binário localmente
                     nome_padrao_foto = "Foto perfil Matheus.jpg"
                     with open(nome_padrao_foto, "wb") as f:
                         f.write(foto_carregada.getbuffer())
                         
-                    st.success("✨ Imagem atualizada com sucesso! Recarregando a interface...")
+                    # Sincroniza a imagem e deleta as anteriores no GitHub automaticamente
+                    sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
+                    st.success("✨ Imagem atualizada e enviada ao GitHub com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar arquivo: {e}")
