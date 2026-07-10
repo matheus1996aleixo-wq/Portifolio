@@ -23,7 +23,7 @@ SENHA_ADMIN = "@Kayle2023"
 ARQUIVO_DADOS = "dados_portfolio.csv"
 ARQUIVO_VAGAS = "dados_vagas.csv"
 ARQUIVO_SKILLS = "dados_skills.csv"
-NOME_FOTO = "Foto_Perfil_Matheus_Upload.jpg"
+NOME_FOTO = "Foto_Perfil_Matheus.jpg"
 
 # Inicialização de bases
 for arquivo, cols in [
@@ -54,16 +54,31 @@ st.markdown("""
         background-color: #0F172A;
         color: #E2E8F0;
     }
-    .avatar-img { width: 155px; height: 155px; border-radius: 50%; border: 3px solid #38BDF8; }
-    h1 { color: #F8FAFC !important; font-weight: 700 !important; }
-    h2, h3 { color: #38BDF8 !important; font-weight: 600 !important; }
+    .avatar-img {
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        border: 4px solid #38BDF8;
+        box-shadow: 0 4px 20px rgba(56,189,248,0.4);
+        margin-bottom: 15px;
+    }
+    .info-card {
+        background: #1E293B;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+    h1 { color: #F8FAFC !important; font-weight: 700; text-align: center; }
+    h2, h3 { color: #38BDF8 !important; font-weight: 600; }
+    .section-card {
+        background: #1E293B;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
 </style>
 """, unsafe_allow_html=True)
-
-# Carregamento das bases
-df_dados = pd.read_csv(ARQUIVO_DADOS)
-df_vagas = pd.read_csv(ARQUIVO_VAGAS)
-df_skills = pd.read_csv(ARQUIVO_SKILLS)
 
 # Sidebar
 with st.sidebar:
@@ -74,13 +89,14 @@ with st.sidebar:
         st.caption("⚠️ Nenhuma foto carregada.")
 
     st.markdown("### 📋 Informações Pessoais")
-    st.markdown("**👤 Nome:** Matheus Aleixo")
-    st.markdown("**📅 Nascimento:** 20/02/1996")
-    st.markdown("**📍 Localização:** Várzea Paulista - SP")
-    st.markdown("**✉️ E-mail:** [matheus.aleixo2020@gmail.com](mailto:matheus.aleixo2020@gmail.com)")
-    st.markdown("**🔗 LinkedIn:** [www.linkedin.com/in/matheus-aleixo-299a05247](https://www.linkedin.com/in/matheus-aleixo-299a05247)")
+    st.markdown('<div class="info-card">👤 <b>Nome:</b> Matheus Aleixo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">📅 <b>Nascimento:</b> 20/02/1996</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">📍 <b>Localização:</b> Várzea Paulista - SP</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">✉️ <b>E-mail:</b> <a href="mailto:matheus.aleixo2020@gmail.com">matheus.aleixo2020@gmail.com</a></div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">🔗 <b>LinkedIn:</b> <a href="https://www.linkedin.com/in/matheus-aleixo-299a05247/">Perfil</a></div>', unsafe_allow_html=True)
 
-    with st.expander("🛠️ Configurações de Sistema", expanded=False):
+    st.markdown("---")
+    with st.expander("🛠️ Painel de Acesso", expanded=False):
         if not st.session_state["autenticado"]:
             input_user = st.text_input("User ID", key="adm_user")
             input_pass = st.text_input("Senha", type="password", key="adm_pass")
@@ -98,7 +114,7 @@ with st.sidebar:
 
 # Cabeçalho
 st.title("💻 M. Aleixo TI")
-st.markdown("Especialista em RPA, ETL, Power BI e suporte SAP.")
+st.markdown("<p style='font-size: 1.2rem; color: #94A3B8; text-align:center;'>Especialista em RPA, ETL, Power BI e suporte SAP.</p>", unsafe_allow_html=True)
 
 # Tabs
 aba_objetivo, aba_experiencias, aba_conhecimentos, aba_projetos, aba_formacao = st.tabs([
@@ -107,85 +123,73 @@ aba_objetivo, aba_experiencias, aba_conhecimentos, aba_projetos, aba_formacao = 
 
 # Objetivo
 with aba_objetivo:
-    st.markdown("## Objetivo e Foco")
+    st.markdown('<div class="section-card"><h2>🎯 Objetivo e Foco</h2>', unsafe_allow_html=True)
     st.markdown("""
     Atuar na área de Tecnologia da Informação como Analista de Sistemas ou Desenvolvedor, 
     visando evoluir profissionalmente, desenvolver novas competências e agregar valor à organização.
     """)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Experiências
 with aba_experiencias:
-    st.markdown("## Experiências Profissionais")
+    st.markdown('<div class="section-card"><h2>💼 Experiências Profissionais</h2>', unsafe_allow_html=True)
     st.markdown("""
-    **Professor de Tecnologia e Matemática — Secretaria da Educação | Campo Limpo Paulista - SP (Outubro 2025 – Fevereiro 2026)**  
-    Ensino Fundamental II e Médio, com foco em competências lógicas, digitais e matemáticas.
+    **Professor de Tecnologia e Matemática — Secretaria da Educação (2025–2026)**  
+    Ensino Fundamental II e Médio, foco em competências digitais e matemáticas.
 
-    **Consultor SAP Jr — Stefanini | Remoto (Projeto Temporário)**  
-    Suporte Funcional SAP S/4HANA (Nível I e II) nos módulos FI, CO e SD.  
-    Monitoramento de IDocs, execução de parametrizações (customizing) e aplicação de notas SAP.
+    **Consultor SAP Jr — Stefanini (Remoto)**  
+    Suporte SAP S/4HANA nos módulos FI, CO e SD.
 
-    **Estagiário de Tecnologia da Informação — Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)**  
-    Suporte funcional SAP ECC (Basis, FI, CO, SD e MM).  
-    Participação no projeto global SPIRIT e atuação na solução fiscal Guepardo.
+    **Estagiário de TI — Continental Automotive (2023–2025)**  
+    Suporte SAP ECC, participação no projeto global SPIRIT e solução fiscal Guepardo.
     """)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Conhecimentos
 with aba_conhecimentos:
-    st.markdown("## Conhecimentos Técnicos")
+    st.markdown('<div class="section-card"><h2>🧠 Conhecimentos Técnicos</h2>', unsafe_allow_html=True)
     st.markdown("""
     - SAP ECC e S/4HANA (FI, CO, SD, MM, Basis, ABAP)  
-    - Ferramenta Fiscal Guepardo, monitoramento e tratamento de IDocs  
-    - Automação em Python, UiPath, Scrapy, Playwright, BeautifulSoup  
-    - Pipelines ETL, extração e modelagem (HTML, XML, JSON)  
-    - PostgreSQL, integração e consumo de APIs  
-    - AWS Lambda, EventBridge, Apache Airflow, Git  
-    - Suporte ao usuário, conferência de notas fiscais  
-    - Soft Skills: organização, resolução de problemas, mediação de conflitos, comunicação assertiva  
-    - Linguagens: Python (Avançado), Java (Básico), C (Básico)
+    - Automação em Python, UiPath, Scrapy, Playwright  
+    - Pipelines ETL, HTML, XML, JSON  
+    - PostgreSQL, APIs, AWS Lambda, Airflow  
+    - Soft Skills: organização, resolução de problemas, comunicação assertiva
     """)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Projetos
 with aba_projetos:
-    st.markdown("## Meus Projetos")
+    st.markdown('<div class="section-card"><h2>🚀 Meus Projetos</h2>', unsafe_allow_html=True)
     st.info("Os projetos serão adicionados e gerenciados pelo painel administrativo.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Formação
 with aba_formacao:
-    st.markdown("## Formação Acadêmica")
+    st.markdown('<div class="section-card"><h2>📚 Formação Acadêmica</h2>', unsafe_allow_html=True)
     st.markdown("""
     **Bacharelado em Tecnologia da Informação — UNIVESP**  
     Status: Ensino Superior Completo / Graduado
 
     **Certificações e Cursos:**
-    - UiPath Academy — Formação Profissional em Automação (Conclusão: 21/04/2024)
-    - KA Solutions — Fundamentos Básicos do SAP S/4HANA (Carga Horária: 8h)
-    - Udemy — Power BI Avançado (Conclusão: 31/07/2025)
-    - Udemy — Python Avançado (Conclusão: 30/12/2025)
+    - UiPath Academy — Automação (2024)
+    - KA Solutions — SAP S/4HANA (8h)
+    - Udemy — Power BI Avançado (2025)
+    - Udemy — Python Avançado (2025)
     """)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Painel Administrativo
 if st.session_state["autenticado"]:
     st.markdown("---")
-    st.markdown("## 🔒 Terminal do Administrador")
-    menu_adm = st.selectbox("Escolha a Base", ["Projetos", "Vagas", "Skills", "🖼️ Foto de Perfil"])
+    st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
 
-    if menu_adm == "🖼️ Foto de Perfil":
-        foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
-        if foto_carregada is not None:
-            st.image(foto_carregada, width=200)
-                          if st.button("💾 Aplicar Nova Imagem", type="primary"):
-             try:
-                 if os.path.exists(NOME_FOTO):
-                     os.remove(NOME_FOTO)
-                 with open(NOME_FOTO, "wb") as f:
-                     f.write(foto_carregada.getbuffer())
-                 st.success("Imagem atualizada com sucesso!")
-                 st.rerun()
-             except Exception as e:
-                 st.error(f"Erro ao salvar: {e}")
+    menu_adm = st.selectbox(
+        "Escolha a Base para Modificar",
+        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "🖼️ Atualizar Foto de Perfil"]
+    )
 
-
-                         # --- PAINEL ADMINISTRATIVO ---
+    if menu_adm == "🖼️ Atual"
+    # --- PAINEL ADMINISTRATIVO ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
@@ -292,7 +296,7 @@ if st.session_state["autenticado"]:
         else:
             st.info("Nenhuma skill cadastrada.")
 
-           # 4. ATUALIZAR FOTO DE PERFIL
+    # 4. ATUALIZAR FOTO DE PERFIL
     elif menu_adm == "🖼️ Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
@@ -308,6 +312,5 @@ if st.session_state["autenticado"]:
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
-
 
 
