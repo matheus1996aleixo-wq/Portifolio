@@ -117,8 +117,7 @@ HISTÓRICO PROFISSIONAL:
 COMPETÊNCIAS TÉCNICAS:
 - BI & Dados: Power BI Avançado (Dashboards Gerenciais e Modelagem DAX), Bancos de Dados Relacionais (PostgreSQL), Pipelines ETL & Manipulação de Dados (JSON, XML, HTML).
 - Automação (RPA): Python Avançado (Scrapy, Playwright, BeautifulSoup), Plataforma de Robótica UiPath.
-- ERP Integrado: Suporte Funcional SAP (ECC e S/4HANA), Módulos FI, CO, SD, MM, Basis, ABAP debug e Solução Fiscal Guepardo.
-- Práticas de Nuvem: Controle de versão distribuído via Git/GitHub, noções de escalabilidade serverless em nuvem (AWS Lambda / EventBridge) e orquestradores de fluxo (Apache Airflow)."""
+- ERP Integrado: Suporte Funcional SAP (ECC e S/4HANA), Módulos FI, CO, SD, MM, Basis, ABAP debug e Solução Fiscal Guepardo."""
 
 # --- INJEÇÃO DE ESTILOS CSS PREMIUM ---
 st.markdown("""
@@ -481,7 +480,10 @@ if st.session_state["autenticado"]:
         if not df_dados.empty:
             st.dataframe(df_dados)
             idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
-            if st.button("❌ Apagar Registro"):
+            
+            # Caixa de confirmação de segurança antes de excluir
+            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_proj")
+            if st.button("❌ Apagar Registro", disabled=not confirmar_exclusao):
                 titulo_removido = df_dados.loc[idx_ex, 'Título']
                 df_dados.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
                 sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
@@ -498,13 +500,16 @@ if st.session_state["autenticado"]:
                 nl = pd.DataFrame([{"Título": v_tit, "Descrição": v_des}])
                 pd.concat([df_vagas, nl], ignore_index=True).to_csv(ARQUIVO_VAGAS, index=False)
                 sincronizar_com_github(f"Painel Admin: Adicionado foco de vaga '{v_tit}'")
-                st.success("Foco Adicionado e atualizado no GitHub!")
+                st.success("Foco Adicionado e updated no GitHub!")
                 st.rerun()
                 
         st.subheader("🗑️ Remover Focos Existentes")
         st.dataframe(df_vagas)
         idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
-        if st.button("❌ Apagar Foco"):
+        
+        # Caixa de confirmação de segurança antes de excluir
+        confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_vaga")
+        if st.button("❌ Apagar Foco", disabled=not confirmar_exclusao):
             foco_removido = df_vagas.loc[idx_ex, 'Título']
             df_vagas.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
             sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
@@ -528,7 +533,10 @@ if st.session_state["autenticado"]:
         st.subheader("🗑️ Remover Skills")
         st.dataframe(df_skills)
         idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
-        if st.button("❌ Apagar Skill"):
+        
+        # Caixa de confirmação de segurança antes de excluir
+        confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_skill")
+        if st.button("❌ Apagar Skill", disabled=not confirmar_exclusao):
             skill_removida = df_skills.loc[idx_ex, 'Nome']
             df_skills.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
             sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
@@ -553,7 +561,10 @@ if st.session_state["autenticado"]:
         st.subheader("🗑️ Remover Cursos Existentes")
         st.dataframe(df_cursos)
         idx_ex = st.number_input("Índice do curso para apagar:", min_value=0, max_value=len(df_cursos)-1, step=1)
-        if st.button("❌ Apagar Curso"):
+        
+        # Caixa de confirmação de segurança antes de excluir
+        confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_curso")
+        if st.button("❌ Apagar Curso", disabled=not confirmar_exclusao):
             curso_removido = df_cursos.loc[idx_ex, 'Título']
             df_cursos.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
             sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
