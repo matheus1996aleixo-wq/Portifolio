@@ -173,16 +173,17 @@ if st.session_state["autenticado"]:
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
         if foto_carregada is not None:
             st.image(foto_carregada, width=200)
-          if st.button("💾 Aplicar"):
-    try:
-        if os.path.exists(NOME_FOTO):
-            os.remove(NOME_FOTO)
-        with open(NOME_FOTO, "wb") as f:
-            f.write(foto_carregada.getbuffer())
-        st.success("Imagem atualizada com sucesso!")
-        st.rerun()
-    except Exception as e:
-        st.error(f"Erro ao salvar: {e}")
+                  if st.button("💾 Aplicar Nova Imagem", type="primary"):
+             try:
+                 if os.path.exists(NOME_FOTO):
+                     os.remove(NOME_FOTO)
+                 with open(NOME_FOTO, "wb") as f:
+                     f.write(foto_carregada.getbuffer())
+                 st.success("Imagem atualizada com sucesso!")
+                 st.rerun()
+             except Exception as e:
+                 st.error(f"Erro ao salvar: {e}")
+
 
                          # --- PAINEL ADMINISTRATIVO ---
 if st.session_state["autenticado"]:
