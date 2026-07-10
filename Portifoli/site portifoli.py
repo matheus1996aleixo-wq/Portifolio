@@ -341,14 +341,20 @@ if st.session_state["autenticado"]:
         if not df_dados.empty:
             st.dataframe(df_dados)
             idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
-            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão do registro", key="conf_ex_dados")
+            
+            # Caixa de seleção para confirmação precisa
+            linha_selecionada = df_dados.iloc[[idx_ex]]
+            st.markdown("**Item que será apagado:**")
+            st.dataframe(linha_selecionada)
+            confirmar_exclusao = st.checkbox("✅ Confirmo que selecionei a linha correta para a exclusão", key="conf_ex_dados")
+            
             if st.button("❌ Apagar Registro"):
                 if confirmar_exclusao:
                     df_dados.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
                     st.success("Registro removido com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Marque a caixa de verificação para confirmar.")
+                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
         else:
             st.info("Nenhum projeto cadastrado.")
 
@@ -370,14 +376,20 @@ if st.session_state["autenticado"]:
         if not df_vagas.empty:
             st.dataframe(df_vagas)
             idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
-            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão deste foco", key="conf_ex_vagas")
+            
+            # Caixa de seleção para confirmação precisa
+            linha_selecionada = df_vagas.iloc[[idx_ex]]
+            st.markdown("**Foco que será apagado:**")
+            st.dataframe(linha_selecionada)
+            confirmar_exclusao = st.checkbox("✅ Confirmo que selecionei a linha correta para a exclusão", key="conf_ex_vagas")
+            
             if st.button("❌ Apagar Foco"):
                 if confirmar_exclusao:
                     df_vagas.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
                     st.success("Foco removido com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Marque a caixa de verificação para confirmar.")
+                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
         else:
             st.info("Nenhum foco cadastrado.")
 
@@ -400,14 +412,20 @@ if st.session_state["autenticado"]:
         if not df_skills.empty:
             st.dataframe(df_skills)
             idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
-            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão desta skill", key="conf_ex_skills")
+            
+            # Caixa de seleção para confirmação precisa
+            linha_selecionada = df_skills.iloc[[idx_ex]]
+            st.markdown("**Skill que será apagada:**")
+            st.dataframe(linha_selecionada)
+            confirmar_exclusao = st.checkbox("✅ Confirmo que selecionei a linha correta para a exclusão", key="conf_ex_skills")
+            
             if st.button("❌ Apagar Skill"):
                 if confirmar_exclusao:
                     df_skills.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
                     st.success("Skill removida com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Marque a caixa de verificação para confirmar.")
+                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
         else:
             st.info("Nenhuma skill cadastrada.")
 
@@ -431,14 +449,20 @@ if st.session_state["autenticado"]:
         if not df_edu.empty:
             st.dataframe(df_edu)
             idx_ex = st.number_input("Índice do item para apagar:", min_value=0, max_value=len(df_edu)-1, step=1)
-            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão deste registro", key="conf_ex_edu")
+            
+            # Caixa de seleção para confirmação precisa aplicada aqui também
+            linha_selecionada = df_edu.iloc[[idx_ex]]
+            st.markdown("**Histórico educacional que será apagado:**")
+            st.dataframe(linha_selecionada)
+            confirmar_exclusao = st.checkbox("✅ Confirmo que selecionei a linha correta para a exclusão", key="conf_ex_edu")
+            
             if st.button("❌ Apagar Registro"):
                 if confirmar_exclusao:
                     df_edu.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_EDU, index=False)
                     st.success("Item educacional removido com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Marque a caixa de verificação para confirmar.")
+                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
         else:
             st.info("Nenhum item educacional cadastrado.")
 
@@ -454,7 +478,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem updated com sucesso!")
+                    st.success("Imagem atualizada com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
