@@ -170,7 +170,7 @@ with aba_experiencias:
         </div>
         """, unsafe_allow_html=True)
 
-# 3. ABA CONHECIMENTOS (Com verificação de emojis dinâmicos)
+# 3. ABA CONHECIMENTOS (Com verificação de emojis condicionais)
 with aba_conhecimentos:
     st.markdown("### 🧠 Hard Skills & Nível de Domínio")
     
@@ -200,7 +200,7 @@ with aba_conhecimentos:
             with col_alvo:
                 nome_skill = row['Nome']
                 
-                # Verificação dinâmica de palavras-chave para atribuição de emojis
+                # Atribuição de Emojis Dinâmicos baseados no Texto
                 emoji_adicional = ""
                 if "python" in nome_skill.lower():
                     emoji_adicional = " 🐍"
@@ -237,7 +237,7 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto foi publicado ainda. Utilize o Painel de Controle para adicionar novos itens.")
 
-# 5. ABA FORMAÇÃO E CURSOS (Com os novos cursos inclusos no padrão básico)
+# 5. ABA FORMAÇÃO E CURSES
 with aba_formacao:
     st.markdown("### 📚 Histórico Acadêmico e Certificações")
     df_edu = pd.read_csv(ARQUIVO_EDU)
@@ -427,7 +427,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem updated com sucesso!")
+                    st.success("Imagem atualizada com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
