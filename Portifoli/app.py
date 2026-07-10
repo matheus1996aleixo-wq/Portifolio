@@ -66,11 +66,8 @@ if not os.path.exists(ARQUIVO_CURSOS):
 def sincronizar_com_github(mensagem_commit="Painel Admin: Sincronização automática de dados"):
     """Adiciona as alterações, commita e envia diretamente ao GitHub remoto."""
     try:
-        # Adiciona arquivos CSVs modificados e quaisquer extensões comuns de imagens
         subprocess.run(["git", "add", ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS, "*.jpg", "*.png", "*.jpeg"], check=True)
-        # Executa o Commit local com mensagem contextualizada
         subprocess.run(["git", "commit", "-m", mensagem_commit], check=True)
-        # Faz o Push para o servidor do GitHub
         subprocess.run(["git", "push"], check=True)
         st.toast("🚀 Sincronização automatizada concluída no GitHub!", icon="🔄")
     except subprocess.CalledProcessError as e:
@@ -102,7 +99,7 @@ FORMAÇÃO ACADÊMICA:
 
 HISTÓRICO PROFISSIONAL:
 1. Professor de Tecnologia e Matemática - Secretaria da Educação | Campo Limpo Paulista - SP (Outubro 2025 – Fevereiro 2026)
-   • Condução e liderança de turmas focando no raciocínio lógico, abstração e competências digitais.
+   • Condução e liderança de turmas focando no raciocínio lógico, abstraction e competências digitais.
    • Mediação activa de cronogramas digitais de ensino e uso estratégico de ferramentas de TI aplicadas à educação.
 
 2. Consultor SAP Jr - Stefanini | Atuação Remota (Escopo de Projeto)
@@ -421,7 +418,7 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto dinâmico publicado.")
 
-# --- ABA: CURSOS E FORMAÇÃO (AGORA TOTALMENTE DINÂMICA) ---
+# --- ABA: CURSOS E FORMAÇÃO ---
 with aba_formacao:
     st.markdown("## Formação Acadêmica Regular")
     st.markdown("""
@@ -446,7 +443,7 @@ with aba_formacao:
     else:
         st.info("Nenhuma certificação cadastrada.")
 
-# --- PAINEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO (COM COMMIT/PUSH AUTOMÁTICO) ---
+# --- PAINEL CENTRAL DE ADMINISTRAÇÃO PROTEGIDO ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
@@ -478,16 +475,20 @@ if st.session_state["autenticado"]:
                 
         st.subheader("🗑️ Exclusão de Projetos")
         if not df_dados.empty:
-            st.dataframe(df_dados)
-            idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
+            idx_excluir = None
+            st.write("Marque a caixa correspondente à linha profissional que deseja apagar:")
+            for idx, row in df_dados.iterrows():
+                if st.checkbox(f"Apagar: **{row['Título']}** ({row['Categoria']})", key=f"del_proj_{idx}"):
+                    idx_excluir = idx
             
-            # Caixa de confirmação de segurança antes de excluir
-            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_proj")
-            if st.button("❌ Apagar Registro", disabled=not confirmar_exclusao):
-                titulo_removido = df_dados.loc[idx_ex, 'Título']
-                df_dados.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
-                sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
-                st.rerun()
+            if idx_excluir is not None:
+                if st.button("❌ Confirmar e Apagar Registro", type="primary"):
+                    titulo_removido = df_dados.loc[idx_excluir, 'Título']
+                    df_dados.drop(idx_excluir).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Removido projeto '{titulo_removido}'")
+                    st.rerun()
+            else:
+                st.info("Selecione uma caixa de seleção acima para habilitar o gatilho de exclusão.")
 
     # 2. GERENCIAR VAGAS / FOCOS
     elif menu_adm == "Focos de Vagas (Objetivo)":
@@ -504,16 +505,21 @@ if st.session_state["autenticado"]:
                 st.rerun()
                 
         st.subheader("🗑️ Remover Focos Existentes")
-        st.dataframe(df_vagas)
-        idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
-        
-        # Caixa de confirmação de segurança antes de excluir
-        confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_vaga")
-        if st.button("❌ Apagar Foco", disabled=not confirmar_exclusao):
-            foco_removido = df_vagas.loc[idx_ex, 'Título']
-            df_vagas.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
-            sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
-            st.rerun()
+        if not df_vagas.empty:
+            idx_excluir = None
+            st.write("Marque a caixa correspondente à linha de foco que deseja apagar:")
+            for idx, row in df_vagas.iterrows():
+                if st.checkbox(f"Apagar: **{row['Título']}**", key=f"del_vaga_{idx}"):
+                    idx_excluir = idx
+            
+            if idx_excluir is not None:
+                if st.button("❌ Confirmar e Apagar Foco", type="primary"):
+                    foco_removido = df_vagas.loc[idx_excluir, 'Título']
+                    df_vagas.drop(idx_excluir).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Removido foco de vaga '{foco_removido}'")
+                    st.rerun()
+            else:
+                st.info("Selecione uma caixa de seleção acima para habilitar o gatilho de exclusão.")
 
     # 3. GERENCIAR CONHECIMENTOS
     elif menu_adm == "Novos Conhecimentos Técnicos":
@@ -531,16 +537,21 @@ if st.session_state["autenticado"]:
                 st.rerun()
                 
         st.subheader("🗑️ Remover Skills")
-        st.dataframe(df_skills)
-        idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
-        
-        # Caixa de confirmação de segurança antes de excluir
-        confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_skill")
-        if st.button("❌ Apagar Skill", disabled=not confirmar_exclusao):
-            skill_removida = df_skills.loc[idx_ex, 'Nome']
-            df_skills.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
-            sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
-            st.rerun()
+        if not df_skills.empty:
+            idx_excluir = None
+            st.write("Marque a caixa correspondente à linha de skill que deseja apagar:")
+            for idx, row in df_skills.iterrows():
+                if st.checkbox(f"Apagar: **{row['Nome']}** ({row['Categoria']} - {row['Porcentagem']}%)", key=f"del_skill_{idx}"):
+                    idx_excluir = idx
+            
+            if idx_excluir is not None:
+                if st.button("❌ Confirmar e Apagar Skill", type="primary"):
+                    skill_removida = df_skills.loc[idx_excluir, 'Nome']
+                    df_skills.drop(idx_excluir).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Removida skill '{skill_removida}'")
+                    st.rerun()
+            else:
+                st.info("Selecione uma caixa de seleção acima para habilitar o gatilho de exclusão.")
 
     # 4. GERENCIAR CURSOS E CERTIFICAÇÕES
     elif menu_adm == "Especializações e Cursos":
@@ -559,18 +570,23 @@ if st.session_state["autenticado"]:
                 st.rerun()
                 
         st.subheader("🗑️ Remover Cursos Existentes")
-        st.dataframe(df_cursos)
-        idx_ex = st.number_input("Índice do curso para apagar:", min_value=0, max_value=len(df_cursos)-1, step=1)
-        
-        # Caixa de confirmação de segurança antes de excluir
-        confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão (marque para habilitar o botão)", key="confirm_curso")
-        if st.button("❌ Apagar Curso", disabled=not confirmar_exclusao):
-            curso_removido = df_cursos.loc[idx_ex, 'Título']
-            df_cursos.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
-            sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
-            st.rerun()
+        if not df_cursos.empty:
+            idx_excluir = None
+            st.write("Marque a caixa correspondente à linha do curso que deseja apagar:")
+            for idx, row in df_cursos.iterrows():
+                if st.checkbox(f"Apagar: **{row['Título']}** ({row['Emissor']})", key=f"del_curso_{idx}"):
+                    idx_excluir = idx
+            
+            if idx_excluir is not None:
+                if st.button("❌ Confirmar e Apagar Curso", type="primary"):
+                    curso_removido = df_cursos.loc[idx_excluir, 'Título']
+                    df_cursos.drop(idx_excluir).reset_index(drop=True).to_csv(ARQUIVO_CURSOS, index=False)
+                    sincronizar_com_github(f"Painel Admin: Removido curso '{curso_removido}'")
+                    st.rerun()
+            else:
+                st.info("Selecione uma caixa de seleção acima para habilitar o gatilho de exclusão.")
 
-    # 5. ATUALIZAR FOTO DE PERFIL DIRETO PELO SITE (AGORA INTEGRADO AO REPOSITÓRIO REMOTO)
+    # 5. ATUALIZAR FOTO DE PERFIL
     elif menu_adm == "🖼️ Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
         st.write("Selecione sua foto profissional do computador. Ela será renomeada, configurada e enviada ao Git.")
@@ -582,19 +598,16 @@ if st.session_state["autenticado"]:
             
             if st.button("💾 Aplicar Nova Imagem ao Perfil", type="primary"):
                 try:
-                    # Remove arquivos antigos de imagens para evitar duplicidade ou conflito com o glob
                     extensoes_limpar = ["*.jpg", "*.jpeg", "*.png"]
                     for ext in extensoes_limpar:
                         for arq_antigo in glob.glob(ext):
                             if arq_antigo not in [ARQUIVO_DADOS, ARQUIVO_VAGAS, ARQUIVO_SKILLS, ARQUIVO_CURSOS]:
                                 os.remove(arq_antigo)
                                 
-                    # Salva o arquivo de imagem binário localmente
                     nome_padrao_foto = "Foto perfil Matheus.jpg"
                     with open(nome_padrao_foto, "wb") as f:
                         f.write(foto_carregada.getbuffer())
                         
-                    # Sincroniza a imagem e deleta as anteriores no GitHub automaticamente
                     sincronizar_com_github("Painel Admin: Atualização da foto de perfil profissional")
                     st.success("✨ Imagem atualizada e enviada ao GitHub com sucesso!")
                     st.rerun()
