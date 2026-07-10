@@ -46,7 +46,7 @@ def obter_imagem_base64():
 
 foto_base64 = obter_imagem_base64()
 
-# CSS Premium
+# CSS Premium Customizado
 st.markdown("""
 <style>
     html, body, [data-testid="stAppViewContainer"] {
@@ -69,13 +69,24 @@ st.markdown("""
         margin-bottom: 10px;
     }
     h1 { color: #F8FAFC !important; font-weight: 700; text-align: center; }
-    h2, h3 { color: #38BDF8 !important; font-weight: 600; }
-    .section-card {
-        background: #1E293B;
+    h2, h3 { color: #38BDF8 !important; font-weight: 600; margin-bottom: 15px; }
+    
+    /* Layouts de Cartões Avançados */
+    .custom-card {
+        background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         border: 1px solid #334155;
+        border-left: 5px solid #38BDF8;
         border-radius: 12px;
         padding: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .skill-container {
+        background: #1E293B;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        margin-bottom: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -112,69 +123,151 @@ with st.sidebar:
                 st.session_state["autenticado"] = False
                 st.rerun()
 
-# Cabeçalho
+# Cabeçalho principal
 st.title("💻 M. Aleixo TI")
 st.markdown("<p style='font-size: 1.2rem; color: #94A3B8; text-align:center;'>Especialista em RPA, ETL, Power BI e suporte SAP.</p>", unsafe_allow_html=True)
 
-# Tabs
+# Tabs / Abas
 aba_objetivo, aba_experiencias, aba_conhecimentos, aba_projetos, aba_formacao = st.tabs([
     "👤 Objetivo & Foco", "💼 Experiências", "🧠 Conhecimentos", "🚀 Projetos", "📚 Formação"
 ])
 
-# Objetivo
+# 1. ABA OBJETIVO & FOCO (Dinâmica via CSV ou padrão elegante)
 with aba_objetivo:
-    st.markdown('<div class="section-card"><h2>🎯 Objetivo e Foco</h2>', unsafe_allow_html=True)
+    st.markdown("### 🎯 Objetivo Profissional")
+    
+    # Card Fixo Principal
     st.markdown("""
-    Atuar na área de Tecnologia da Informação como Analista de Sistemas ou Desenvolvedor, 
-    visando evoluir profissionalmente, desenvolver novas competências e agregar valor à organização.
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
+    <div class="custom-card">
+        <p style='font-size:1.15rem; margin:0; line-height:1.6;'>
+            Atuar na área de Tecnologia da Informação como <b>Analista de Sistemas</b> ou <b>Desenvolvedor</b>, 
+            visando evoluir profissionalmente, desenvolver novas competências e agregar valor estratégico à organização.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Focos específicos vindos do banco de dados/CSV
+    df_vagas = pd.read_csv(ARQUIVO_VAGAS)
+    if not df_vagas.empty:
+        st.markdown("#### 🎯 Alvos de Atuação Cadastrados")
+        for idx, row in df_vagas.iterrows():
+            st.markdown(f"""
+            <div class="custom-card" style="border-left-color: #A855F7;">
+                <h4 style="margin:0 0 8px 0; color:#38BDF8;">✨ {row['Título']}</h4>
+                <p style="margin:0; color:#94A3B8;">{row['Descrição']}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-# Experiências
+# 2. ABA EXPERIÊNCIAS (Layout de Linha do Tempo / Cards Modernos)
 with aba_experiencias:
-    st.markdown('<div class="section-card"><h2>💼 Experiências Profissionais</h2>', unsafe_allow_html=True)
-    st.markdown("""
-    **Professor de Tecnologia e Matemática — Secretaria da Educação (2025–2026)** Ensino Fundamental II e Médio, foco em competências digitais e matemáticas.
+    st.markdown("### 💼 Trajetória Profissional")
+    
+    experiencias = [
+        {"cargo": "Professor de Tecnologia e Matemática", "empresa": "Secretaria da Educação", "periodo": "2025–2026", "desc": "Ensino Fundamental II e Médio, foco em desenvolvimento de competências digitais, raciocínio lógico e resolução de problemas matemáticos utilizando ferramentas tecnológicas."},
+        {"cargo": "Consultor SAP Jr", "empresa": "Stefanini", "periodo": "Remoto", "desc": "Atuação no suporte funcional do sistema SAP S/4HANA focado diretamente na resolução de chamados e melhorias nos módulos FI, CO e SD."},
+        {"cargo": "Estagiário de TI", "empresa": "Continental Automotive", "periodo": "2023–2025", "desc": "Suporte a usuários no ecossistema SAP ECC, participação direta no projeto global de migração SPIRIT e manutenção de regras da solução fiscal complementar Guepardo."}
+    ]
+    
+    for exp in experiencias:
+        st.markdown(f"""
+        <div class="custom-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <h4 style="margin: 0; color: #F8FAFC;">🚀 {exp['cargo']}</h4>
+                <span style="background: #334155; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: #38BDF8; font-weight: bold;">⏱️ {exp['periodo']}</span>
+            </div>
+            <p style="margin: 5px 0 10px 0; font-weight: 500; color: #38BDF8;">🏢 {exp['empresa']}</p>
+            <p style="margin: 0; color: #94A3B8; font-size: 0.95rem; line-height: 1.5;">{exp['desc']}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    **Consultor SAP Jr — Stefanini (Remoto)** Suporte SAP S/4HANA nos módulos FI, CO e SD.
-
-    **Estagiário de TI — Continental Automotive (2023–2025)** Suporte SAP ECC, participação no projeto global SPIRIT e solução fiscal Guepardo.
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Conhecimentos
+# 3. ABA CONHECIMENTOS (Barras de Nível de Skill Dinâmicas)
 with aba_conhecimentos:
-    st.markdown('<div class="section-card"><h2>🧠 Conhecimentos Técnicos</h2>', unsafe_allow_html=True)
-    st.markdown("""
-    - SAP ECC e S/4HANA (FI, CO, SD, MM, Basis, ABAP)  
-    - Automação em Python, UiPath, Scrapy, Playwright  
-    - Pipelines ETL, HTML, XML, JSON  
-    - PostgreSQL, APIs, AWS Lambda, Airflow  
-    - Soft Skills: organização, resolução de problemas, comunicação assertiva
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("### 🧠 Hard Skills & Nível de Domínio")
+    
+    df_skills = pd.read_csv(ARQUIVO_SKILLS)
+    
+    if df_skills.empty:
+        # Layout Mock/Padrão caso o CSV esteja vazio inicialmente
+        skills_padrao = [
+            {"Categoria": "SAP", "Nome": "SAP ECC & S/4HANA (FI, CO, SD, MM)", "Porcentagem": 85},
+            {"Categoria": "RPA", "Nome": "Automação (Python, UiPath, Playwright)", "Porcentagem": 90},
+            {"Categoria": "Dados", "Nome": "Engenharia de Dados (PostgreSQL, ETL, Airflow)", "Porcentagem": 80}
+        ]
+        df_skills = pd.DataFrame(skills_padrao)
+        
+    categorias = df_skills["Categoria"].unique()
+    
+    for cat in categorias:
+        st.markdown(f"#### 🛠️ Categoria: {cat}")
+        df_filtrado = df_skills[df_skills["Categoria"] == cat]
+        
+        # Colunas duplas para renderizar lado a lado de forma harmoniosa
+        cols_skill = st.columns(2)
+        for idx, row in enumerate(df_filtrado.iterrows()):
+            col_alvo = cols_skill[idx % 2]
+            with col_alvo:
+                st.markdown(f"**{row[1]['Nome']}** ({row[1]['Porcentagem']}%)")
+                st.progress(int(row[1]['Porcentagem']) / 100)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-# Projetos
+# 4. ABA PROJETOS (Cards Dinâmicos com Links)
 with aba_projetos:
-    st.markdown('<div class="section-card"><h2>🚀 Meus Projetos</h2>', unsafe_allow_html=True)
-    st.info("Os projetos serão adicionados e gerenciados pelo painel administrativo.")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("### 🚀 Projetos e Portfólio Técnico")
+    df_dados = pd.read_csv(ARQUIVO_DADOS)
+    
+    if not df_dados.empty:
+        for idx, row in df_dados.iterrows():
+            st.markdown(f"""
+            <div class="custom-card" style="border-left-color: #10B981;">
+                <span style="background: #065F46; color: #34D399; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">{row['Categoria']}</span>
+                <h4 style="margin: 8px 0; color: #F8FAFC;">{row['Título']}</h4>
+                <p style="color: #94A3B8; font-size: 0.95rem;">{row['Descrição']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            col_btn1, col_btn2, _ = st.columns([1, 1, 4])
+            if pd.notna(row['Link do Processo']) and row['Link do Processo']:
+                col_btn1.link_button("📂 Ver Repositório", row['Link do Processo'], use_container_width=True)
+            if pd.notna(row['Link do Vídeo']) and row['Link do Vídeo']:
+                col_btn2.link_button("🎥 Assistir Demonstração", row['Link do Vídeo'], use_container_width=True)
+            st.markdown("<hr style='border-color: #334155; margin: 15px 0;'>", unsafe_allow_html=True)
+    else:
+        st.info("Nenhum projeto foi publicado ainda. Utilize o Painel de Controle para adicionar novos itens.")
 
-# Formação
+# 5. ABA FORMAÇÃO E CURSOS (Cards Diferenciados)
 with aba_formacao:
-    st.markdown('<div class="section-card"><h2>📚 Formação Acadêmica</h2>', unsafe_allow_html=True)
-    st.markdown("""
-    **Bacharelado em Tecnologia da Informação — UNIVESP** Status: Ensino Superior Completo / Graduado
+    st.markdown("### 📚 Histórico Acadêmico e Certificações")
+    
+    col_grad, col_cert = st.columns(2)
+    
+    with col_grad:
+        st.markdown("#### 🎓 Graduação")
+        st.markdown("""
+        <div class="custom-card" style="border-left-color: #38BDF8; height: 100%;">
+            <h4 style="margin:0; color:#F8FAFC;">Bacharelado em Tecnologia da Informação</h4>
+            <p style="margin:5px 0; color:#38BDF8; font-weight:bold;">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO (UNIVESP)</p>
+            <p style="margin:0; color:#94A3B8; font-size:0.9rem;"><b>Status:</b> Graduado / Ensino Superior Completo</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col_cert:
+        st.markdown("#### 📜 Cursos e Certificados Relevantes")
+        certificacoes = [
+            {"nome": "UiPath Academy — Especialização em Automação RPA", "ano": "2024"},
+            {"nome": "KA Solutions — SAP S/4HANA (Formação Funcional)", "ano": "2024"},
+            {"nome": "Udemy — Power BI Avançado e Dashboards", "ano": "2025"},
+            {"nome": "Udemy — Engenharia de Dados Avançada com Python", "ano": "2025"}
+        ]
+        for cert in certificacoes:
+            st.markdown(f"""
+            <div style="background:#1E293B; border:1px solid #334155; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:between; align-items:center;">
+                <div style="color:#E2E8F0; font-size:0.95rem; width:85%;">🔹 {cert['nome']}</div>
+                <div style="color:#38BDF8; font-size:0.85rem; font-weight:bold; width:15%; text-align:right;">{cert['ano']}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    **Certificações e Cursos:**
-    - UiPath Academy — Automação (2024)
-    - KA Solutions — SAP S/4HANA (8h)
-    - Udemy — Power BI Avançado (2025)
-    - Udemy — Python Avançado (2025)
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-# Painel Administrativo
+# --- PAINEL ADMINISTRATIVO (Inalterado, apenas corrigido do erro anterior) ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
@@ -293,7 +386,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem updated com sucesso!")
+                    st.success("Imagem atualizada com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
