@@ -134,14 +134,11 @@ with aba_objetivo:
 with aba_experiencias:
     st.markdown('<div class="section-card"><h2>💼 Experiências Profissionais</h2>', unsafe_allow_html=True)
     st.markdown("""
-    **Professor de Tecnologia e Matemática — Secretaria da Educação (2025–2026)**  
-    Ensino Fundamental II e Médio, foco em competências digitais e matemáticas.
+    **Professor de Tecnologia e Matemática — Secretaria da Educação (2025–2026)** Ensino Fundamental II e Médio, foco em competências digitais e matemáticas.
 
-    **Consultor SAP Jr — Stefanini (Remoto)**  
-    Suporte SAP S/4HANA nos módulos FI, CO e SD.
+    **Consultor SAP Jr — Stefanini (Remoto)** Suporte SAP S/4HANA nos módulos FI, CO e SD.
 
-    **Estagiário de TI — Continental Automotive (2023–2025)**  
-    Suporte SAP ECC, participação no projeto global SPIRIT e solução fiscal Guepardo.
+    **Estagiário de TI — Continental Automotive (2023–2025)** Suporte SAP ECC, participação no projeto global SPIRIT e solução fiscal Guepardo.
     """)
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -167,8 +164,7 @@ with aba_projetos:
 with aba_formacao:
     st.markdown('<div class="section-card"><h2>📚 Formação Acadêmica</h2>', unsafe_allow_html=True)
     st.markdown("""
-    **Bacharelado em Tecnologia da Informação — UNIVESP**  
-    Status: Ensino Superior Completo / Graduado
+    **Bacharelado em Tecnologia da Informação — UNIVESP** Status: Ensino Superior Completo / Graduado
 
     **Certificações e Cursos:**
     - UiPath Academy — Automação (2024)
@@ -179,17 +175,6 @@ with aba_formacao:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Painel Administrativo
-if st.session_state["autenticado"]:
-    st.markdown("---")
-    st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
-
-    menu_adm = st.selectbox(
-        "Escolha a Base para Modificar",
-        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "🖼️ Atualizar Foto de Perfil"]
-    )
-
-    if menu_adm == "🖼️ Atual"
-    # --- PAINEL ADMINISTRATIVO ---
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
@@ -308,9 +293,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem atualizada com sucesso!")
+                    st.success("Imagem updated com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
-
-
