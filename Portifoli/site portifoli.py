@@ -291,8 +291,8 @@ if st.session_state["autenticado"]:
         else:
             st.info("Nenhuma skill cadastrada.")
 
-    # 4. ATUALIZAR FOTO DE PERFIL
-    elif menu_adm == "🖼️ Atualizar Foto de Perfil":
+        # 4. ATUALIZAR FOTO DE PERFIL
+        elif menu_adm == "🖼️ Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
         if foto_carregada is not None:
@@ -307,3 +307,5 @@ if st.session_state["autenticado"]:
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
+
+
