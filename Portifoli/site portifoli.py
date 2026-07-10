@@ -5,258 +5,388 @@ import os
 
 # Configuração da página
 st.set_page_config(
-    page_title="M. Aleixo TI - Portfolio",
-    page_icon="🚀",
+    page_title="M. Aleixo TI",
+    page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- ESTADO DE SESSÃO E ARQUIVOS ---
+# Estado de sessão
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
+# Credenciais
 USUARIO_ADMIN = "matheus"
 SENHA_ADMIN = "@Kayle2023"
 
-ARQUIVO_PROJETOS = "dados_portfolio.csv"
+# Arquivos locais
+ARQUIVO_DADOS = "dados_portfolio.csv"
 ARQUIVO_VAGAS = "dados_vagas.csv"
 ARQUIVO_SKILLS = "dados_skills.csv"
-ARQUIVO_EDU = "dados_educacao.csv"
 NOME_FOTO = "Foto_Perfil_Matheus.jpg"
 
-# Inicialização de bases de dados (CSV)
-bases = [
-    (ARQUIVO_PROJETOS, ["Categoria", "Título", "Descrição", "Link do Processo", "Link do Vídeo"]),
+# Inicialização de bases
+for arquivo, cols in [
+    (ARQUIVO_DADOS, ["Categoria", "Título", "Descrição", "Link do Processo", "Link do Vídeo"]),
     (ARQUIVO_VAGAS, ["Título", "Descrição"]),
-    (ARQUIVO_SKILLS, ["Categoria", "Nome", "Porcentagem"]),
-    (ARQUIVO_EDU, ["Tipo", "Instituição", "Ano", "Descrição"])
-]
-
-for arquivo, cols in bases:
+    (ARQUIVO_SKILLS, ["Categoria", "Nome", "Porcentagem"])
+]:
     if not os.path.exists(arquivo):
         pd.DataFrame(columns=cols).to_csv(arquivo, index=False)
 
-# --- FUNÇÕES DE APOIO ---
+# Função imagem
 def obter_imagem_base64():
     if os.path.exists(NOME_FOTO):
         try:
             with open(NOME_FOTO, "rb") as image_file:
                 return base64.b64encode(image_file.read()).decode()
-        except: return None
+        except:
+            return None
     return None
 
 foto_base64 = obter_imagem_base64()
 
-# --- CSS PERSONALIZADO (CORES DIVERTIDAS E CHAMATIVAS) ---
+# CSS Premium Customizado
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-    
     html, body, [data-testid="stAppViewContainer"] {
+        font-family: 'Inter', sans-serif;
         background-color: #0F172A;
         color: #E2E8F0;
-        font-family: 'Inter', sans-serif;
     }
-    
-    /* Cards com bordas coloridas */
-    .skill-card {
-        background: #1E293B;
-        border-radius: 15px;
-        padding: 20px;
-        border: 1px solid #334155;
-        margin-bottom: 15px;
-        transition: transform 0.3s;
-    }
-    .skill-card:hover {
-        transform: translateY(-5px);
-        border-color: #38BDF8;
-    }
-    
-    /* Cores das categorias */
-    .cat-sap { color: #FACC15; } /* Amarelo */
-    .cat-rpa { color: #4ADE80; } /* Verde */
-    .cat-dados { color: #F87171; } /* Vermelho/Coral */
-    
     .avatar-img {
         width: 160px; height: 160px;
         border-radius: 50%;
         border: 4px solid #38BDF8;
-        box-shadow: 0 4px 25px rgba(56,189,248,0.5);
+        box-shadow: 0 4px 20px rgba(56,189,248,0.4);
+        margin-bottom: 15px;
     }
-
     .info-card {
         background: #1E293B;
         border: 1px solid #334155;
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 8px;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
     }
+    h1 { color: #F8FAFC !important; font-weight: 700; text-align: center; }
+    h2, h3 { color: #38BDF8 !important; font-weight: 600; margin-bottom: 15px; }
     
-    .stProgress > div > div > div > div {
-        background-image: linear-gradient(to right, #38BDF8, #818CF8);
+    /* Layouts de Cartões Avançados */
+    .custom-card {
+        background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+        border: 1px solid #334155;
+        border-left: 5px solid #38BDF8;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .skill-container {
+        background: #1E293B;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        margin-bottom: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR ---
+# Sidebar
 with st.sidebar:
     if foto_base64:
-        st.markdown(f'<center><img class="avatar-img" src="data:image/jpeg;base64,{foto_base64}"></center>', unsafe_allow_html=True)
+        st.markdown(f'<img class="avatar-img" src="data:image/jpeg;base64,{foto_base64}" alt="Matheus Aleixo">', unsafe_allow_html=True)
     else:
-        st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=150)
-    
-    st.markdown("<h2 style='text-align: center; color: white;'>Matheus Aleixo</h2>", unsafe_allow_html=True)
-    
-    with st.expander("🛠️ Acesso Restrito", expanded=False):
+        st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=130)
+        st.caption("⚠️ Nenhuma foto carregada.")
+
+    st.markdown("### 📋 Informações Pessoais")
+    st.markdown('<div class="info-card">👤 <b>Nome:</b> Matheus Aleixo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">📅 <b>Nascimento:</b> 20/02/1996</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">📍 <b>Localização:</b> Várzea Paulista - SP</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">✉️ <b>E-mail:</b> <a href="mailto:matheus.aleixo2020@gmail.com">matheus.aleixo2020@gmail.com</a></div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-card">🔗 <b>LinkedIn:</b> <a href="https://www.linkedin.com/in/matheus-aleixo-299a05247/">Perfil</a></div>', unsafe_allow_html=True)
+
+    st.markdown("---")
+    with st.expander("🛠️ Painel de Acesso", expanded=False):
         if not st.session_state["autenticado"]:
-            u = st.text_input("Usuário")
-            p = st.text_input("Senha", type="password")
-            if st.button("Entrar"):
-                if u == USUARIO_ADMIN and p == SENHA_ADMIN:
+            input_user = st.text_input("User ID", key="adm_user")
+            input_pass = st.text_input("Senha", type="password", key="adm_pass")
+            if st.button("🔑 Autenticar"):
+                if input_user == USUARIO_ADMIN and input_pass == SENHA_ADMIN:
                     st.session_state["autenticado"] = True
                     st.rerun()
-                else: st.error("Incorreto")
+                else:
+                    st.error("Acesso negado.")
         else:
-            if st.button("Sair"):
+            st.write("🟢 Modo Editor Ativo")
+            if st.button("🔒 Logoff", type="primary"):
                 st.session_state["autenticado"] = False
                 st.rerun()
 
-# --- CONTEÚDO PRINCIPAL ---
-st.title("💻 Portfólio M. Aleixo TI")
+# Cabeçalho principal
+st.title("💻 M. Aleixo TI")
+st.markdown("<p style='font-size: 1.2rem; color: #94A3B8; text-align:center;'>Especialista em RPA, ETL, Power BI e suporte SAP.</p>", unsafe_allow_html=True)
 
-tab_obj, tab_exp, tab_skills, tab_proj, tab_edu = st.tabs([
-    "🎯 Objetivo", "💼 Experiências", "🧠 Conhecimentos", "🚀 Projetos", "📚 Formação"
+# Tabs / Abas
+aba_objetivo, aba_experiencias, aba_conhecimentos, aba_projetos, aba_formacao = st.tabs([
+    "👤 Objetivo & Foco", "💼 Experiências", "🧠 Conhecimentos", "🚀 Projetos", "📚 Formação"
 ])
 
-# 1. OBJETIVO
-with tab_obj:
-    st.markdown("### 🎯 Foco Profissional")
-    st.info("Especialista focado em otimização de processos, integração SAP e arquitetura de dados.")
-    df_v = pd.read_csv(ARQUIVO_VAGAS)
-    for _, r in df_v.iterrows():
-        st.markdown(f"<div class='skill-card'><h4>✨ {r['Título']}</h4><p>{r['Descrição']}</p></div>", unsafe_allow_html=True)
-
-# 2. EXPERIÊNCIAS (Resumo fixo ou dinâmico)
-with tab_exp:
-    st.markdown("### 💼 Trajetória")
-    exps = [
-        ("Consultor SAP Jr", "Stefanini", "Suporte S/4HANA FI/CO/SD"),
-        ("Estagiário TI", "Continental", "SAP ECC & Projeto SPIRIT"),
-    ]
-    for cargo, emp, desc in exps:
-        st.markdown(f"<div class='skill-card'><b>{cargo}</b> @ {emp}<br><small>{desc}</small></div>", unsafe_allow_html=True)
-
-# 3. CONHECIMENTOS (LAYOUT CHAMATIVO COM ÍCONES)
-with tab_skills:
-    st.markdown("### 🧠 Hard Skills & Nível de Domínio")
-    df_s = pd.read_csv(ARQUIVO_SKILLS)
+# 1. ABA OBJETIVO & FOCO (Dinâmica via CSV ou padrão elegante)
+with aba_objetivo:
+    st.markdown("### 🎯 Objetivo Profissional")
     
-    # Mapeamento de Cores e Ícones
-    icones = {"SAP": "⚙️", "RPA": "🤖", "Dados": "📊"}
-    cores = {"SAP": "cat-sap", "RPA": "cat-rpa", "Dados": "cat-dados"}
-
-    if not df_s.empty:
-        cats = df_s["Categoria"].unique()
-        for c in cats:
-            st.markdown(f"<h3 class='{cores.get(c, '')}'>{icones.get(c, '🔹')} Categoria: {c}</h3>", unsafe_allow_html=True)
-            df_f = df_s[df_s["Categoria"] == c]
-            
-            c1, c2 = st.columns(2)
-            for i, row in enumerate(df_f.iterrows()):
-                alvo = c1 if i % 2 == 0 else c2
-                with alvo:
-                    st.write(f"**{row[1]['Nome']}**")
-                    st.progress(int(row[1]['Porcentagem']))
-            st.write("---")
-
-# 4. PROJETOS
-with tab_proj:
-    st.markdown("### 🚀 Projetos e Automações")
-    df_p = pd.read_csv(ARQUIVO_PROJETOS)
-    for _, r in df_p.iterrows():
-        with st.container():
-            st.markdown(f"<div class='skill-card'><h4>{r['Título']}</h4><p>{r['Descrição']}</p></div>", unsafe_allow_html=True)
-            if r['Link do Processo']: st.link_button("📂 Ver Código", r['Link do Processo'])
-
-# 5. FORMAÇÃO (DINÂMICA)
-with tab_edu:
-    st.markdown("### 📚 Educação e Cursos")
-    df_e = pd.read_csv(ARQUIVO_EDU)
-    if not df_e.empty:
-        for _, r in df_e.iterrows():
+    # Card Fixo Principal
+    st.markdown("""
+    <div class="custom-card">
+        <p style='font-size:1.15rem; margin:0; line-height:1.6;'>
+            Atuar na área de Tecnologia da Informação como <b>Analista de Sistemas</b> ou <b>Desenvolvedor</b>, 
+            visando evoluir profissionalmente, desenvolver novas competências e agregar valor estratégico à organização.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Focos específicos vindos do banco de dados/CSV
+    df_vagas = pd.read_csv(ARQUIVO_VAGAS)
+    if not df_vagas.empty:
+        st.markdown("#### 🎯 Alvos de Atuação Cadastrados")
+        for idx, row in df_vagas.iterrows():
             st.markdown(f"""
-            <div class='skill-card' style='border-left: 5px solid #38BDF8;'>
-                <h4 style='margin:0;'>🎓 {r['Instituição']}</h4>
-                <p style='color:#38BDF8; margin:0;'><b>{r['Tipo']}</b> | {r['Ano']}</p>
-                <p style='font-size:0.9rem; color:#94A3B8;'>{r['Descrição']}</p>
+            <div class="custom-card" style="border-left-color: #A855F7;">
+                <h4 style="margin:0 0 8px 0; color:#38BDF8;">✨ {row['Título']}</h4>
+                <p style="margin:0; color:#94A3B8;">{row['Descrição']}</p>
             </div>
             """, unsafe_allow_html=True)
-    else: st.info("Nenhuma formação cadastrada.")
 
-# --- PAINEL ADMINISTRATIVO ---
-if st.session_state["autenticado"]:
-    st.divider()
-    st.header("🔒 Painel de Controle")
+# 2. ABA EXPERIÊNCIAS (Layout de Linha do Tempo / Cards Modernos)
+with aba_experiencias:
+    st.markdown("### 💼 Trajetória Profissional")
     
-    opcao = st.selectbox("O que deseja gerenciar?", ["Projetos", "Skills", "Formação/Cursos", "Foco/Vagas", "Foto"])
+    experiencias = [
+        {"cargo": "Professor de Tecnologia e Matemática", "empresa": "Secretaria da Educação", "periodo": "2025–2026", "desc": "Ensino Fundamental II e Médio, foco em desenvolvimento de competências digitais, raciocínio lógico e resolução de problemas matemáticos utilizando ferramentas tecnológicas."},
+        {"cargo": "Consultor SAP Jr", "empresa": "Stefanini", "periodo": "Remoto", "desc": "Atuação no suporte funcional do sistema SAP S/4HANA focado diretamente na resolução de chamados e melhorias nos módulos FI, CO e SD."},
+        {"cargo": "Estagiário de TI", "empresa": "Continental Automotive", "periodo": "2023–2025", "desc": "Suporte a usuários no ecossistema SAP ECC, participação direta no projeto global de migração SPIRIT e manutenção de regras da solução fiscal complementar Guepardo."}
+    ]
+    
+    for exp in experiencias:
+        st.markdown(f"""
+        <div class="custom-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <h4 style="margin: 0; color: #F8FAFC;">🚀 {exp['cargo']}</h4>
+                <span style="background: #334155; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: #38BDF8; font-weight: bold;">⏱️ {exp['periodo']}</span>
+            </div>
+            <p style="margin: 5px 0 10px 0; font-weight: 500; color: #38BDF8;">🏢 {exp['empresa']}</p>
+            <p style="margin: 0; color: #94A3B8; font-size: 0.95rem; line-height: 1.5;">{exp['desc']}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # GERENCIAR FORMAÇÃO (NOVO)
-    if opcao == "Formação/Cursos":
-        st.subheader("📝 Adicionar Formação/Curso")
-        with st.form("form_edu"):
-            f_tipo = st.text_input("Tipo (Ex: Bacharelado, Curso Online, Certificação)")
-            f_inst = st.text_input("Instituição")
-            f_ano = st.text_input("Ano/Período")
-            f_desc = st.text_area("Breve descrição")
-            if st.form_submit_button("Salvar Formação"):
-                nova_f = pd.DataFrame([{"Tipo": f_tipo, "Instituição": f_inst, "Ano": f_ano, "Descrição": f_desc}])
-                pd.concat([pd.read_csv(ARQUIVO_EDU), nova_f], ignore_index=True).to_csv(ARQUIVO_EDU, index=False)
-                st.success("Salvo!")
-                st.rerun()
+# 3. ABA CONHECIMENTOS (Barras de Nível de Skill Dinâmicas)
+with aba_conhecimentos:
+    st.markdown("### 🧠 Hard Skills & Nível de Domínio")
+    
+    df_skills = pd.read_csv(ARQUIVO_SKILLS)
+    
+    if df_skills.empty:
+        # Layout Mock/Padrão caso o CSV esteja vazio inicialmente
+        skills_padrao = [
+            {"Categoria": "SAP", "Nome": "SAP ECC & S/4HANA (FI, CO, SD, MM)", "Porcentagem": 85},
+            {"Categoria": "RPA", "Nome": "Automação (Python, UiPath, Playwright)", "Porcentagem": 90},
+            {"Categoria": "Dados", "Nome": "Engenharia de Dados (PostgreSQL, ETL, Airflow)", "Porcentagem": 80}
+        ]
+        df_skills = pd.DataFrame(skills_padrao)
         
-        st.subheader("🗑️ Remover")
-        df_edit_e = pd.read_csv(ARQUIVO_EDU)
-        if not df_edit_e.empty:
-            it_rem = st.selectbox("Selecione para excluir", df_edit_e.index, format_func=lambda x: df_edit_e.iloc[x]['Instituição'])
-            if st.button("Excluir Formação"):
-                df_edit_e.drop(it_rem).to_csv(ARQUIVO_EDU, index=False)
-                st.rerun()
-
-    # GERENCIAR SKILLS (CORES/ICONES)
-    elif opcao == "Skills":
-        st.subheader("Adicionar Conhecimento")
-        with st.form("form_s"):
-            s_cat = st.selectbox("Categoria", ["SAP", "RPA", "Dados"])
-            s_nom = st.text_input("Nome da Skill")
-            s_per = st.slider("Nível (%)", 0, 100, 80)
-            if st.form_submit_button("Gravar"):
-                ns = pd.DataFrame([{"Categoria": s_cat, "Nome": s_nom, "Porcentagem": s_per}])
-                pd.concat([pd.read_csv(ARQUIVO_SKILLS), ns], ignore_index=True).to_csv(ARQUIVO_SKILLS, index=False)
-                st.rerun()
+    categorias = df_skills["Categoria"].unique()
+    
+    for cat in categorias:
+        st.markdown(f"#### 🛠️ Categoria: {cat}")
+        df_filtrado = df_skills[df_skills["Categoria"] == cat]
         
-        df_edit_s = pd.read_csv(ARQUIVO_SKILLS)
-        st.dataframe(df_edit_s)
-        idx_s = st.number_input("Index para excluir", 0, 100)
-        if st.button("Remover Skill"):
-            df_edit_s.drop(idx_s).to_csv(ARQUIVO_SKILLS, index=False)
-            st.rerun()
+        # Colunas duplas para renderizar lado a lado de forma harmoniosa
+        cols_skill = st.columns(2)
+        for idx, row in enumerate(df_filtrado.iterrows()):
+            col_alvo = cols_skill[idx % 2]
+            with col_alvo:
+                st.markdown(f"**{row[1]['Nome']}** ({row[1]['Porcentagem']}%)")
+                st.progress(int(row[1]['Porcentagem']) / 100)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-    # (As outras opções como Projetos e Foto seguem a mesma lógica CRUD anterior...)
-    elif opcao == "Foto":
-        uploaded_file = st.file_uploader("Escolha a foto de perfil", type=["jpg", "png", "jpeg"])
-        if uploaded_file and st.button("Substituir Foto"):
-            with open(NOME_FOTO, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            st.success("Foto atualizada!")
-            st.rerun()
+# 4. ABA PROJETOS (Cards Dinâmicos com Links)
+with aba_projetos:
+    st.markdown("### 🚀 Projetos e Portfólio Técnico")
+    df_dados = pd.read_csv(ARQUIVO_DADOS)
+    
+    if not df_dados.empty:
+        for idx, row in df_dados.iterrows():
+            st.markdown(f"""
+            <div class="custom-card" style="border-left-color: #10B981;">
+                <span style="background: #065F46; color: #34D399; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">{row['Categoria']}</span>
+                <h4 style="margin: 8px 0; color: #F8FAFC;">{row['Título']}</h4>
+                <p style="color: #94A3B8; font-size: 0.95rem;">{row['Descrição']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            col_btn1, col_btn2, _ = st.columns([1, 1, 4])
+            if pd.notna(row['Link do Processo']) and row['Link do Processo']:
+                col_btn1.link_button("📂 Ver Repositório", row['Link do Processo'], use_container_width=True)
+            if pd.notna(row['Link do Vídeo']) and row['Link do Vídeo']:
+                col_btn2.link_button("🎥 Assistir Demonstração", row['Link do Vídeo'], use_container_width=True)
+            st.markdown("<hr style='border-color: #334155; margin: 15px 0;'>", unsafe_allow_html=True)
+    else:
+        st.info("Nenhum projeto foi publicado ainda. Utilize o Painel de Controle para adicionar novos itens.")
 
-    elif opcao == "Projetos":
-        with st.form("f_p"):
-            t = st.text_input("Título")
-            d = st.text_area("Descrição")
-            cat = st.text_input("Categoria")
-            l = st.text_input("Link")
-            if st.form_submit_button("Salvar Projeto"):
-                np = pd.DataFrame([{"Categoria": cat, "Título": t, "Descrição": d, "Link do Processo": l, "Link do Vídeo": ""}])
-                pd.concat([pd.read_csv(ARQUIVO_PROJETOS), np], ignore_index=True).to_csv(ARQUIVO_PROJETOS, index=False)
+# 5. ABA FORMAÇÃO E CURSOS (Cards Diferenciados)
+with aba_formacao:
+    st.markdown("### 📚 Histórico Acadêmico e Certificações")
+    
+    col_grad, col_cert = st.columns(2)
+    
+    with col_grad:
+        st.markdown("#### 🎓 Graduação")
+        st.markdown("""
+        <div class="custom-card" style="border-left-color: #38BDF8; height: 100%;">
+            <h4 style="margin:0; color:#F8FAFC;">Bacharelado em Tecnologia da Informação</h4>
+            <p style="margin:5px 0; color:#38BDF8; font-weight:bold;">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO (UNIVESP)</p>
+            <p style="margin:0; color:#94A3B8; font-size:0.9rem;"><b>Status:</b> Graduado / Ensino Superior Completo</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col_cert:
+        st.markdown("#### 📜 Cursos e Certificados Relevantes")
+        certificacoes = [
+            {"nome": "UiPath Academy — Especialização em Automação RPA", "ano": "2024"},
+            {"nome": "KA Solutions — SAP S/4HANA (Formação Funcional)", "ano": "2024"},
+            {"nome": "Udemy — Power BI Avançado e Dashboards", "ano": "2025"},
+            {"nome": "Udemy — Engenharia de Dados Avançada com Python", "ano": "2025"}
+        ]
+        for cert in certificacoes:
+            st.markdown(f"""
+            <div style="background:#1E293B; border:1px solid #334155; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:between; align-items:center;">
+                <div style="color:#E2E8F0; font-size:0.95rem; width:85%;">🔹 {cert['nome']}</div>
+                <div style="color:#38BDF8; font-size:0.85rem; font-weight:bold; width:15%; text-align:right;">{cert['ano']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+
+# --- PAINEL ADMINISTRATIVO (Inalterado, apenas corrigido do erro anterior) ---
+if st.session_state["autenticado"]:
+    st.markdown("---")
+    st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
+
+    menu_adm = st.selectbox(
+        "Escolha a Base para Modificar",
+        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "🖼️ Atualizar Foto de Perfil"]
+    )
+
+    # 1. GERENCIAR PROJETOS
+    if menu_adm == "Projetos e Automações":
+        st.subheader("📝 Adicionar Novo Projeto")
+        p_cat = st.selectbox("Categoria", ["Projeto", "Automação"])
+        p_tit = st.text_input("Título")
+        p_des = st.text_area("Descrição")
+        p_l1 = st.text_input("Link do Repositório (GitHub)")
+        p_l2 = st.text_input("Link do Vídeo")
+
+        if st.button("🚀 Gravar Projeto"):
+            if p_tit and p_des:
+                nl = pd.DataFrame([{
+                    "Categoria": p_cat,
+                    "Título": p_tit,
+                    "Descrição": p_des,
+                    "Link do Processo": p_l1,
+                    "Link do Vídeo": p_l2
+                }])
+                pd.concat([pd.read_csv(ARQUIVO_DADOS), nl], ignore_index=True).to_csv(ARQUIVO_DADOS, index=False)
+                st.success("Projeto salvo com sucesso!")
                 st.rerun()
+
+        st.subheader("🗑️ Exclusão de Projetos")
+        df_dados = pd.read_csv(ARQUIVO_DADOS)
+        if not df_dados.empty:
+            st.dataframe(df_dados)
+            idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
+            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão do registro", key="conf_ex_dados")
+            if st.button("❌ Apagar Registro"):
+                if confirmar_exclusao:
+                    df_dados.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_DADOS, index=False)
+                    st.success("Registro removido com sucesso!")
+                    st.rerun()
+                else:
+                    st.warning("Marque a caixa de verificação para confirmar.")
+        else:
+            st.info("Nenhum projeto cadastrado.")
+
+    # 2. GERENCIAR VAGAS (OBJETIVO)
+    elif menu_adm == "Focos de Vagas (Objetivo)":
+        st.subheader("📝 Inserir Novo Foco de Vaga")
+        v_tit = st.text_input("Área/Vaga (Ex: Analista de Negócios)")
+        v_des = st.text_area("Descrição Estratégica do Foco")
+
+        if st.button("🚀 Gravar Novo Foco"):
+            if v_tit and v_des:
+                nl = pd.DataFrame([{"Título": v_tit, "Descrição": v_des}])
+                pd.concat([pd.read_csv(ARQUIVO_VAGAS), nl], ignore_index=True).to_csv(ARQUIVO_VAGAS, index=False)
+                st.success("Foco adicionado com sucesso!")
+                st.rerun()
+
+        st.subheader("🗑️ Remover Focos Existentes")
+        df_vagas = pd.read_csv(ARQUIVO_VAGAS)
+        if not df_vagas.empty:
+            st.dataframe(df_vagas)
+            idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
+            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão deste foco", key="conf_ex_vagas")
+            if st.button("❌ Apagar Foco"):
+                if confirmar_exclusao:
+                    df_vagas.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_VAGAS, index=False)
+                    st.success("Foco removido com sucesso!")
+                    st.rerun()
+                else:
+                    st.warning("Marque a caixa de verificação para confirmar.")
+        else:
+            st.info("Nenhum foco cadastrado.")
+
+    # 3. GERENCIAR CONHECIMENTOS
+    elif menu_adm == "Novos Conhecimentos Técnicos":
+        st.subheader("📝 Inserir Nova Skill")
+        s_cat = st.selectbox("Categoria", ["Dados", "RPA", "SAP"])
+        s_nom = st.text_input("Nome do Conhecimento (Ex: Apache Airflow)")
+        s_pct = st.slider("Porcentagem de Domínio", 0, 100, 80)
+
+        if st.button("🚀 Gravar Skill"):
+            if s_nom:
+                nl = pd.DataFrame([{"Categoria": s_cat, "Nome": s_nom, "Porcentagem": s_pct}])
+                pd.concat([pd.read_csv(ARQUIVO_SKILLS), nl], ignore_index=True).to_csv(ARQUIVO_SKILLS, index=False)
+                st.success("Skill adicionada com sucesso!")
+                st.rerun()
+
+        st.subheader("🗑️ Remover Skills")
+        df_skills = pd.read_csv(ARQUIVO_SKILLS)
+        if not df_skills.empty:
+            st.dataframe(df_skills)
+            idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
+            confirmar_exclusao = st.checkbox("⚠️ Confirmar exclusão desta skill", key="conf_ex_skills")
+            if st.button("❌ Apagar Skill"):
+                if confirmar_exclusao:
+                    df_skills.drop(idx_ex).reset_index(drop=True).to_csv(ARQUIVO_SKILLS, index=False)
+                    st.success("Skill removida com sucesso!")
+                    st.rerun()
+                else:
+                    st.warning("Marque a caixa de verificação para confirmar.")
+        else:
+            st.info("Nenhuma skill cadastrada.")
+
+    # 4. ATUALIZAR FOTO DE PERFIL
+    elif menu_adm == "🖼️ Atualizar Foto de Perfil":
+        st.subheader("Substituir Imagem do Perfil")
+        foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
+        if foto_carregada is not None:
+            st.image(foto_carregada, width=200, caption="Pré-visualização")
+            if st.button("💾 Aplicar Nova Imagem", type="primary"):
+                try:
+                    if os.path.exists(NOME_FOTO):
+                        os.remove(NOME_FOTO)
+                    with open(NOME_FOTO, "wb") as f:
+                        f.write(foto_carregada.getbuffer())
+                    st.success("Imagem atualizada com sucesso!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Erro ao salvar: {e}")
