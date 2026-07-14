@@ -15,9 +15,13 @@ st.set_page_config(
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
-# Credenciais administrativas
-USUARIO_ADMIN = "matheus"
-SENHA_ADMIN = "@Kayle2023"
+# Credenciais administrativas seguras (busca do st.secrets ou usa padrão local como backup)
+try:
+    USUARIO_ADMIN = st.secrets["USUARIO_ADMIN"]
+    SENHA_ADMIN = st.secrets["SENHA_ADMIN"]
+except:
+    USUARIO_ADMIN = "matheus"
+    SENHA_ADMIN = "@Kayle2023"
 
 # Arquivos locais
 ARQUIVO_DADOS = "dados_portfolio.csv"
@@ -111,21 +115,27 @@ with aba_objetivo:
     - **Automação e Engenharia de Dados:** desenvolvimento de soluções em Python, pipelines ETL e integração de APIs.
     - **Governança e Processos:** gerenciamento de repositórios Git/GitHub e aplicação de visão analítica para segurança e produtividade.
     """)
+    
+    if os.path.exists(ARQUIVO_VAGAS):
+        df_vagas = pd.read_csv(ARQUIVO_VAGAS)
+        if not df_vagas.empty:
+            st.write("---")
+            st.subheader("🎯 Focos de Atuação Adicionais:")
+            for _, row in df_vagas.iterrows():
+                st.markdown(f"**{row['Título']}**")
+                st.write(row['Descrição'])
 
 # --- ABA: EXPERIÊNCIAS ---
 with aba_experiencias:
     st.markdown("## Experiências Profissionais")
     st.markdown("""
-    **Professor de Tecnologia e Matemática — Secretaria da Educação | Campo Limpo Paulista - SP (Outubro 2025 – Fevereiro 2026)**  
-    Ensino Fundamental II e Médio, com foco em competências lógicas, digitais e matemáticas.  
+    **Professor de Tecnologia e Matemática — Secretaria da Educação | Campo Limpo Paulista - SP (Outubro 2025 – Fevereiro 2026)** Ensino Fundamental II e Médio, com foco em competências lógicas, digitais e matemáticas.  
     Uso de ferramentas de TI e materiais digitais para facilitar a compreensão de conceitos abstratos.
 
-    **Consultor SAP Jr — Stefanini | Remoto (Projeto Temporário)**  
-    Suporte Funcional SAP S/4HANA (Nível I e II) nos módulos FI, CO e SD.  
+    **Consultor SAP Jr — Stefanini | Remoto (Projeto Temporário)** Suporte Funcional SAP S/4HANA (Nível I e II) nos módulos FI, CO e SD.  
     Monitoramento de IDocs, execução de parametrizações (customizing) e aplicação de notas SAP.
 
-    **Estagiário de Tecnologia da Informação — Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)**  
-    Suporte funcional SAP ECC (Basis, FI, CO, SD e MM).  
+    **Estagiário de Tecnologia da Informação — Continental Automotive | Várzea Paulista - SP (Junho 2023 – Fevereiro 2025)** Suporte funcional SAP ECC (Basis, FI, CO, SD e MM).  
     Participação no projeto global SPIRIT e atuação na solução fiscal Guepardo.
     """)
 
@@ -143,18 +153,45 @@ with aba_conhecimentos:
     - **Soft Skills:** organização, resolução de problemas, mediação de conflitos e comunicação assertiva.  
     - **Linguagens:** Python (Avançado), Java (Básico), C (Básico).
     """)
+    
+    if os.path.exists(ARQUIVO_SKILLS):
+        df_skills = pd.read_csv(ARQUIVO_SKILLS)
+        if not df_skills.empty:
+            st.write("---")
+            st.subheader("⚡ Novas Skills Adicionadas:")
+            for _, row in df_skills.iterrows():
+                st.write(f"**{row['Nome']}** ({row['Categoria']})")
+                st.progress(int(row['Porcentagem']))
 
 # --- ABA: PROJETOS ---
 with aba_projetos:
     st.markdown("## Meus Projetos")
-    st.info("Os projetos serão adicionados e gerenciados pelo painel administrativo abaixo.")
+    
+    if os.path.exists(ARQUIVO_DADOS):
+        df_dados = pd.read_csv(ARQUIVO_DADOS)
+        if df_dados.empty:
+            st.info("Nenhum projeto dinâmico cadastrado. Use o Painel Administrativo para adicionar novos itens.")
+        else:
+            for _, row in df_dados.iterrows():
+                with st.container():
+                    st.subheader(f"🚀 {row['Título']}")
+                    st.caption(f"Categoria: {row['Categoria']}")
+                    st.write(row['Descrição'])
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if pd.notna(row['Link do Processo']) and str(row['Link do Processo']).strip() != "":
+                            st.link_button("📂 Repositório GitHub", row['Link do Processo'])
+                    with col2:
+                        if pd.notna(row['Link do Vídeo']) and str(row['Link do Vídeo']).strip() != "":
+                            st.link_button("🎥 Ver Demonstração", row['Link do Vídeo'])
+                    st.markdown("---")
 
 # --- ABA: FORMAÇÃO ---
 with aba_formacao:
     st.markdown("## Formação Acadêmica")
     st.markdown("""
-    **Bacharelado em Tecnologia da Informação — UNIVESP**  
-    Status: Ensino Superior Completo / Graduado
+    **Bacharelado em Tecnologia da Informação — UNIVESP** Status: Ensino Superior Completo / Graduado
 
     **Certificações e Cursos:**
     - UiPath Academy — Formação Profissional em Automação (Conclusão: 21/04/2024)
