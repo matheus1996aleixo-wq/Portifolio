@@ -15,12 +15,12 @@ st.set_page_config(
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
-# Credenciais administrativas seguras (Conforme configurado nos Secrets)
+# Credenciais administrativas seguras (Conforme o seu GitHub/Streamlit Secrets)
 try:
     USUARIO_ADMIN = st.secrets["USUARIO_ADMINPORT"]
     SENHA_ADMIN = st.secrets["MINHA_SENHAPORT"]
 except Exception:
-    # Se falhar a leitura na Nuvem, assume estes valores padrão para testes locais (Localhost)
+    # Caso rode localmente (Localhost), usará estas credenciais padrão:
     USUARIO_ADMIN = "matheus"
     SENHA_ADMIN = "sua_senha_aqui"
 
@@ -111,11 +111,12 @@ with st.sidebar:
             input_user = st.text_input("User ID", key="adm_user")
             input_pass = st.text_input("Senha", type="password", key="adm_pass")
             if st.button("🔑 Autenticar"):
+                # Validação corrigida utilizando as variáveis globais padronizadas
                 if input_user == USUARIO_ADMIN and input_pass == SENHA_ADMIN:
                     st.session_state["autenticado"] = True
                     st.rerun()
                 else:
-                    st.error("Acesso negado.")
+                    st.error("Acesso negado. Verifique os dados introduzidos.")
         else:
             st.write("🟢 Modo Editor Ativo")
             if st.button("🔒 Logoff", type="primary"):
