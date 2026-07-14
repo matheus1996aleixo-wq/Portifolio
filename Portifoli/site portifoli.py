@@ -15,9 +15,13 @@ st.set_page_config(
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
-# Credenciais
-USUARIO_ADMIN = "matheus"
-SENHA_ADMIN = "@Kayle2023"
+# Credenciais administrativas seguras (busca do st.secrets ou usa padrão local)
+try:
+    USUARIO_ADMIN = st.secrets["USUARIO_ADMIN"]
+    SENHA_ADMIN = st.secrets["SENHA_ADMIN"]
+except:
+    USUARIO_ADMIN = "matheus"
+    SENHA_ADMIN = "@Kayle2023"
 
 # Arquivos locais
 ARQUIVO_DADOS = "dados_portfolio.csv"
@@ -237,7 +241,7 @@ with aba_projetos:
     else:
         st.info("Nenhum projeto foi publicado ainda. Utilize o Painel de Controle para adicionar novos itens.")
 
-# 5. ABA FORMAÇÃO E CURSES
+# 5. ABA FORMAÇÃO E CURSOS
 with aba_formacao:
     st.markdown("### 📚 Histórico Acadêmico e Certificações")
     df_edu = pd.read_csv(ARQUIVO_EDU)
@@ -278,7 +282,7 @@ if st.session_state["autenticado"]:
 
     menu_adm = st.selectbox(
         "Escolha a Base para Modificar",
-        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "📚 Formações e Cursos", "🖼️ Atualizar Foto de Perfil"]
+        ["Projetos e Automações", "Focos de Vagas (Objetivo)", "Novos Conhecimentos Técnicos", "📚 Formações e Cursos", "🖼️ @Atualizar Foto de Perfil"]
     )
 
     # 1. GERENCIAR PROJETOS
@@ -416,7 +420,7 @@ if st.session_state["autenticado"]:
                     st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
 
     # 5. ATUALIZAR FOTO DE PERFIL
-    elif menu_adm == "🖼️ Atualizar Foto de Perfil":
+    elif menu_adm == "🖼️ @Atualizar Foto de Perfil":
         st.subheader("Substituir Imagem do Perfil")
         foto_carregada = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
         if foto_carregada is not None:
@@ -427,7 +431,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem atualizada com sucesso!")
+                    st.success("Imagem updated com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
