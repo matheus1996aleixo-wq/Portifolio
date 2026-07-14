@@ -1,0 +1,8 @@
+.streamlit/
+__pycache__/
+*.csv
+*.jpg
+*.jpeg
+*.png
+venv/
+.env
