@@ -16,13 +16,12 @@ if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
 # Credenciais administrativas seguras (busca do st.secrets ou usa padrão local)
-# Credenciais administrativas seguras (busca do st.secrets ou usa padrão local)
 try:
     USUARIO_ADMIN = st.secrets["USUARIO_ADMIN"]
     SENHA_ADMIN = st.secrets["MINHA_SENHAPORT"]
-except:
-USUARIO_ADMIN = "matheus"
-MINHA_SENHAPORT = "sua_senha_aqui"
+except Exception:
+    USUARIO_ADMIN = "matheus"
+    SENHA_ADMIN = "sua_senha_aqui"
 
 # Arquivos locais
 ARQUIVO_DADOS = "dados_portfolio.csv"
@@ -47,7 +46,7 @@ def obter_imagem_base64():
         try:
             with open(NOME_FOTO, "rb") as image_file:
                 return base64.b64encode(image_file.read()).decode()
-        except:
+        except Exception:
             return None
     return None
 
@@ -138,7 +137,7 @@ with aba_objetivo:
     <div class="custom-card">
         <p style='font-size:1.15rem; margin:0; line-height:1.6;'>
             Atuar na área de Tecnologia da Informação como <b>Analista de Sistemas</b> ou <b>Desenvolvedor</b>, 
-            visando evoluir profissionalmente, desenvolver novas competências e agregar valor estratégico à organização.
+            visando evoluir profissionalmente, developar novas competências e agregar valor estratégico à organização.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -432,7 +431,7 @@ if st.session_state["autenticado"]:
                         os.remove(NOME_FOTO)
                     with open(NOME_FOTO, "wb") as f:
                         f.write(foto_carregada.getbuffer())
-                    st.success("Imagem updated com sucesso!")
+                    st.success("Imagem atualizada com sucesso!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao salvar: {e}")
