@@ -21,8 +21,9 @@ try:
     USUARIO_ADMIN = st.secrets["USUARIO_ADMIN"]
     SENHA_ADMIN = st.secrets["MINHA_SENHAPORT"]
 except:
-    USUARIO_ADMIN = "matheus"
-    SENHA_ADMIN = "senha_local_fallback"
+USUARIO_ADMIN = "matheus"
+MINHA_SENHAPORT = "sua_senha_aqui"
+
 
 
 # Arquivos locais
