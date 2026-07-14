@@ -15,11 +15,12 @@ st.set_page_config(
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
-# Credenciais administrativas seguras (busca do st.secrets ou usa padrão local)
+# Credenciais administrativas seguras (Conforme configurado nos Secrets)
 try:
-    USUARIO_ADMIN = st.secrets["USUARIO_ADMIN"]
+    USUARIO_ADMIN = st.secrets["USUARIO_ADMINPORT"]
     SENHA_ADMIN = st.secrets["MINHA_SENHAPORT"]
 except Exception:
+    # Se falhar a leitura na Nuvem, assume estes valores padrão para testes locais (Localhost)
     USUARIO_ADMIN = "matheus"
     SENHA_ADMIN = "sua_senha_aqui"
 
@@ -137,7 +138,7 @@ with aba_objetivo:
     <div class="custom-card">
         <p style='font-size:1.15rem; margin:0; line-height:1.6;'>
             Atuar na área de Tecnologia da Informação como <b>Analista de Sistemas</b> ou <b>Desenvolvedor</b>, 
-            visando evoluir profissionalmente, developar novas competências e agregar valor estratégico à organização.
+            visando evoluir profissionalmente, desenvolver novas competências e agregar valor estratégico à organização.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -174,7 +175,7 @@ with aba_experiencias:
         </div>
         """, unsafe_allow_html=True)
 
-# 3. ABA CONHECIMENTOS (Com verificação de emojis condicionais)
+# 3. ABA CONHECIMENTOS
 with aba_conhecimentos:
     st.markdown("### 🧠 Hard Skills & Nível de Domínio")
     
@@ -204,7 +205,6 @@ with aba_conhecimentos:
             with col_alvo:
                 nome_skill = row['Nome']
                 
-                # Atribuição de Emojis Dinâmicos baseados no Texto
                 emoji_adicional = ""
                 if "python" in nome_skill.lower():
                     emoji_adicional = " 🐍"
@@ -278,7 +278,7 @@ with aba_formacao:
 if st.session_state["autenticado"]:
     st.markdown("---")
     st.markdown("## 🔒 Terminal do Administrador — Gerenciamento Total")
-    st.info("💾 **Nota de Persistência:** Todas as modificações feitas neste painel salvam diretamente nos bancos de dados locais (`.csv`). Os itens permanecerão salvos por tempo indeterminado e só sumirão se forem explicitamente excluídos ou trocados aqui no Painel Administrativo.")
+    st.info("💾 **Nota de Persistência:** Todas as modificações feitas neste painel salvam diretamente nos bancos de dados locais (`.csv`).")
 
     menu_adm = st.selectbox(
         "Escolha a Base para Modificar",
@@ -306,7 +306,6 @@ if st.session_state["autenticado"]:
         if not df_dados.empty:
             st.dataframe(df_dados)
             idx_ex = st.number_input("Índice para apagar:", min_value=0, max_value=len(df_dados)-1, step=1)
-            
             linha_selecionada = df_dados.iloc[[idx_ex]]
             st.markdown("**Item que será apagado:**")
             st.dataframe(linha_selecionada)
@@ -318,7 +317,7 @@ if st.session_state["autenticado"]:
                     st.success("Registro removido com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
+                    st.warning("Precisa marcar a caixa de seleção acima antes de excluir.")
 
     # 2. GERENCIAR VAGAS
     elif menu_adm == "Focos de Vagas (Objetivo)":
@@ -338,7 +337,6 @@ if st.session_state["autenticado"]:
         if not df_vagas.empty:
             st.dataframe(df_vagas)
             idx_ex = st.number_input("Índice do foco para apagar:", min_value=0, max_value=len(df_vagas)-1, step=1)
-            
             linha_selecionada = df_vagas.iloc[[idx_ex]]
             st.markdown("**Foco que será apagado:**")
             st.dataframe(linha_selecionada)
@@ -350,13 +348,13 @@ if st.session_state["autenticado"]:
                     st.success("Foco removido com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
+                    st.warning("Precisa marcar a caixa de seleção acima antes de excluir.")
 
     # 3. GERENCIAR CONHECIMENTOS
     elif menu_adm == "Novos Conhecimentos Técnicos":
         st.subheader("📝 Inserir Nova Skill")
         s_cat = st.selectbox("Categoria", ["Dados", "RPA", "SAP"])
-        s_nom = st.text_input("Nome do Conhecimento (Ex: Apache Airflow)")
+        s_nom = st.text_input("Nome do Conhecimento")
         s_pct = st.slider("Porcentagem de Domínio", 0, 100, 80)
 
         if st.button("🚀 Gravar Skill"):
@@ -371,7 +369,6 @@ if st.session_state["autenticado"]:
         if not df_skills.empty:
             st.dataframe(df_skills)
             idx_ex = st.number_input("Índice da skill para apagar:", min_value=0, max_value=len(df_skills)-1, step=1)
-            
             linha_selecionada = df_skills.iloc[[idx_ex]]
             st.markdown("**Skill que será apagada:**")
             st.dataframe(linha_selecionada)
@@ -383,14 +380,14 @@ if st.session_state["autenticado"]:
                     st.success("Skill removida com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
+                    st.warning("Precisa marcar a caixa de seleção acima antes de excluir.")
 
     # 4. GERENCIAR FORMAÇÕES E CURSOS
     elif menu_adm == "📚 Formações e Cursos":
         st.subheader("📝 Cadastrar Nova Formação Acadêmica ou Curso")
         e_inst = st.text_input("Nome da instituição")
         e_nome = st.text_input("Curso ou Formação")
-        e_status = st.selectbox("Se está cursando ou concluiu", ["Concluído", "Cursando"])
+        e_status = st.selectbox("Status", ["Concluído", "Cursando"])
         e_conhecimentos = st.text_area("Conhecimentos do curso")
 
         if st.button("🚀 Gravar Formação/Curso"):
@@ -405,7 +402,6 @@ if st.session_state["autenticado"]:
         if not df_edu.empty:
             st.dataframe(df_edu)
             idx_ex = st.number_input("Índice do item para apagar:", min_value=0, max_value=len(df_edu)-1, step=1)
-            
             linha_selecionada = df_edu.iloc[[idx_ex]]
             st.markdown("**Histórico educacional que será apagado:**")
             st.dataframe(linha_selecionada)
@@ -417,7 +413,7 @@ if st.session_state["autenticado"]:
                     st.success("Item educacional removido com sucesso!")
                     st.rerun()
                 else:
-                    st.warning("Você precisa marcar a caixa de seleção acima antes de excluir.")
+                    st.warning("Precisa marcar a caixa de seleção acima antes de excluir.")
 
     # 5. ATUALIZAR FOTO DE PERFIL
     elif menu_adm == "🖼️ @Atualizar Foto de Perfil":
