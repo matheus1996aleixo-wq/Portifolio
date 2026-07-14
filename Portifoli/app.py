@@ -16,12 +16,14 @@ if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
 # Credenciais administrativas seguras (busca do st.secrets ou usa padrão local como backup)
+# Credenciais administrativas seguras (busca do st.secrets ou usa padrão local)
 try:
     USUARIO_ADMIN = st.secrets["USUARIO_ADMIN"]
-    SENHA_ADMIN = st.secrets["SENHA_ADMIN"]
+    SENHA_ADMIN = st.secrets["MINHA_SENHAPORT"]
 except:
     USUARIO_ADMIN = "matheus"
-    SENHA_ADMIN = "@Kayle2023"
+    SENHA_ADMIN = "senha_local_fallback"
+
 
 # Arquivos locais
 ARQUIVO_DADOS = "dados_portfolio.csv"
