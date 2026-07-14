@@ -24,8 +24,6 @@ except:
 USUARIO_ADMIN = "matheus"
 MINHA_SENHAPORT = "sua_senha_aqui"
 
-
-
 # Arquivos locais
 ARQUIVO_DADOS = "dados_portfolio.csv"
 ARQUIVO_VAGAS = "dados_vagas.csv"
